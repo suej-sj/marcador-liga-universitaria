@@ -108,7 +108,6 @@ body {
   font-weight: 800;
   margin-top: 7px;
   letter-spacing: 1px;
-  transition: opacity 0.25s;
 }
 
 .halftime {
@@ -116,7 +115,6 @@ body {
   font-size: 22px;
   font-weight: 900;
   letter-spacing: 1px;
-  transition: opacity 0.25s, transform 0.25s;
 }
 
 .added-time {
@@ -124,8 +122,6 @@ body {
   margin-top: 7px;
   font-size: 16px;
   font-weight: 800;
-  color: #fff;
-  transition: opacity 0.25s, transform 0.25s;
 }
 
 .controls {
@@ -270,27 +266,14 @@ button:active {
 </div>
 
 
-<script type="module">
+<!-- FIREBASE -->
 
-import { initializeApp }
-  from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-
-import {
-  getAuth,
-  signInAnonymously
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-
-import {
-  getDatabase,
-  ref,
-  onValue,
-  set
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-database-compat.js"></script>
 
 
-/* =========================
-   FIREBASE
-========================= */
+<script>
 
 const firebaseConfig = {
   apiKey: "AIzaSyBZO-xr8s1iXC6RrSYYX3VSaqEs_1Vnj80",
@@ -302,34 +285,24 @@ const firebaseConfig = {
   databaseURL: "https://suenos-en-juego-marcador-default-rtdb.firebaseio.com"
 };
 
-const app = initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 
-const auth = getAuth(app);
+const auth = firebase.auth();
 
-const db = getDatabase(app);
+const db = firebase.database();
 
-
-/* =========================
-   PARTIDO
-========================= */
 
 const params = new URLSearchParams(window.location.search);
 
-const partidoNumero = params.get("partido") || "1";
+const partidoNumero =
+  params.get("partido") || "1";
 
-const matchRef = ref(
-  db,
-  "matches/partido" + partidoNumero
-);
+const matchRef =
+  db.ref("matches/partido" + partidoNumero);
 
-
-/* =========================
-   ESTADO LOCAL
-========================= */
 
 let home = 0;
 let away = 0;
-
 let seconds = 0;
 
 let running = false;
@@ -340,12 +313,8 @@ let addedTime = null;
 
 let timer = null;
 
-let updatingFromFirebase = false;
+let loadingFirebase = true;
 
-
-/* =========================
-   ELEMENTOS
-========================= */
 
 const homeScoreElement =
   document.getElementById("homeScore");
@@ -384,10 +353,6 @@ const awayCrestElement =
   document.getElementById("awayCrest");
 
 
-/* =========================
-   MOSTRAR ESTADO
-========================= */
-
 function updateScreen() {
 
   homeScoreElement.textContent = home;
@@ -399,27 +364,40 @@ function updateScreen() {
   if (currentPeriod === "ENTRETIEMPO") {
 
     clockElement.style.display = "none";
+
     periodElement.style.display = "none";
 
-    halftimeElement.textContent = "ENTRETIEMPO";
-    halftimeElement.style.display = "block";
+    halftimeElement.textContent =
+      "ENTRETIEMPO";
+
+    halftimeElement.style.display =
+      "block";
 
   } else if (currentPeriod === "FINAL") {
 
     clockElement.style.display = "none";
+
     periodElement.style.display = "none";
 
-    halftimeElement.textContent = "FINAL";
-    halftimeElement.style.display = "block";
+    halftimeElement.textContent =
+      "FINAL";
+
+    halftimeElement.style.display =
+      "block";
 
   } else {
 
-    clockElement.style.display = "block";
-    periodElement.style.display = "block";
+    clockElement.style.display =
+      "block";
 
-    halftimeElement.style.display = "none";
+    periodElement.style.display =
+      "block";
 
-    periodElement.textContent = currentPeriod;
+    halftimeElement.style.display =
+      "none";
+
+    periodElement.textContent =
+      currentPeriod;
   }
 
   if (addedTime !== null) {
@@ -433,10 +411,6 @@ function updateScreen() {
   }
 }
 
-
-/* =========================
-   RELOJ
-========================= */
 
 function updateClock() {
 
@@ -453,17 +427,12 @@ function updateClock() {
 }
 
 
-/* =========================
-   GUARDAR FIREBASE
-========================= */
+function saveState() {
 
-async function saveState() {
+  return matchRef.set({
 
-  if (updatingFromFirebase) return;
-
-  await set(matchRef, {
-
-    league: leagueElement.textContent,
+    league:
+      leagueElement.textContent,
 
     homeName:
       homeNameElement.textContent,
@@ -493,17 +462,15 @@ async function saveState() {
 }
 
 
-/* =========================
-   GOLES
-========================= */
-
 function homeGoal() {
 
   home++;
 
   updateScreen();
 
-  saveState();
+  if (!loadingFirebase) {
+    saveState();
+  }
 }
 
 
@@ -513,13 +480,11 @@ function awayGoal() {
 
   updateScreen();
 
-  saveState();
+  if (!loadingFirebase) {
+    saveState();
+  }
 }
 
-
-/* =========================
-   INICIAR RELOJ
-========================= */
 
 function startClock() {
 
@@ -536,23 +501,23 @@ function startClock() {
 
   updateScreen();
 
-  saveState();
+  if (!loadingFirebase) {
+    saveState();
+  }
 
-  timer = setInterval(() => {
+  timer = setInterval(function() {
 
     seconds++;
 
     updateClock();
 
-    saveState();
+    if (!loadingFirebase) {
+      saveState();
+    }
 
   }, 1000);
 }
 
-
-/* =========================
-   PAUSAR
-========================= */
 
 function pauseClock() {
 
@@ -562,29 +527,26 @@ function pauseClock() {
 
   timer = null;
 
-  saveState();
+  if (!loadingFirebase) {
+    saveState();
+  }
 }
 
-
-/* =========================
-   FINALIZAR 1T
-========================= */
 
 function finishFirstHalf() {
 
   pauseClock();
 
-  currentPeriod = "ENTRETIEMPO";
+  currentPeriod =
+    "ENTRETIEMPO";
 
   updateScreen();
 
-  saveState();
+  if (!loadingFirebase) {
+    saveState();
+  }
 }
 
-
-/* =========================
-   INICIAR 2T
-========================= */
 
 function startSecondHalf() {
 
@@ -595,6 +557,199 @@ function startSecondHalf() {
   running = false;
 
   currentPeriod = "2T";
+
+  seconds = 45 * 60;
+
+  addedTime = null;
+
+  updateScreen();
+
+  if (!loadingFirebase) {
+    saveState();
+  }
+
+  setTimeout(function() {
+
+    startClock();
+
+  }, 300);
+}
+
+
+function finishMatch() {
+
+  pauseClock();
+
+  currentPeriod = "FINAL";
+
+  updateScreen();
+
+  if (!loadingFirebase) {
+    saveState();
+  }
+}
+
+
+function showAddedTime(minutes) {
+
+  addedTime = minutes;
+
+  updateScreen();
+
+  if (!loadingFirebase) {
+    saveState();
+  }
+}
+
+
+function hideAddedTime() {
+
+  addedTime = null;
+
+  updateScreen();
+
+  if (!loadingFirebase) {
+    saveState();
+  }
+}
+
+
+function resetMatch() {
+
+  clearInterval(timer);
+
+  timer = null;
+
+  home = 0;
+
+  away = 0;
+
+  seconds = 0;
+
+  running = false;
+
+  currentPeriod = "1T";
+
+  addedTime = null;
+
+  updateScreen();
+
+  if (!loadingFirebase) {
+    saveState();
+  }
+}
+
+
+auth.signInAnonymously()
+
+  .then(function() {
+
+    statusElement.textContent =
+      "Firebase conectado · Partido " +
+      partidoNumero;
+
+    matchRef.on("value", function(snapshot) {
+
+      const data = snapshot.val();
+
+      if (!data) {
+
+        loadingFirebase = false;
+
+        saveState();
+
+        return;
+      }
+
+      clearInterval(timer);
+
+      timer = null;
+
+      home =
+        data.homeScore || 0;
+
+      away =
+        data.awayScore || 0;
+
+      seconds =
+        data.seconds || 0;
+
+      running =
+        data.running || false;
+
+      currentPeriod =
+        data.period || "1T";
+
+      addedTime =
+        data.addedTime ?? null;
+
+
+      if (data.league) {
+
+        leagueElement.textContent =
+          data.league;
+      }
+
+      if (data.homeName) {
+
+        homeNameElement.textContent =
+          data.homeName;
+      }
+
+      if (data.awayName) {
+
+        awayNameElement.textContent =
+          data.awayName;
+      }
+
+      if (data.homeCrest) {
+
+        homeCrestElement.textContent =
+          data.homeCrest;
+      }
+
+      if (data.awayCrest) {
+
+        awayCrestElement.textContent =
+          data.awayCrest;
+      }
+
+
+      updateScreen();
+
+      loadingFirebase = false;
+
+      if (running) {
+
+        timer = setInterval(function() {
+
+          seconds++;
+
+          updateClock();
+
+        }, 1000);
+      }
+
+    });
+
+  })
+
+  .catch(function(error) {
+
+    console.error(error);
+
+    statusElement.textContent =
+      "Error al conectar con Firebase";
+
+  });
+
+
+updateScreen();
+
+</script>
+
+</body>
+</html>rrentPeriod = "2T";
 
   seconds = 45 * 60;
 
