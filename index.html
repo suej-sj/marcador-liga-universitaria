@@ -3,11 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Marcador Liga Universitaria</title>
 
 <style>
-
 * {
   box-sizing: border-box;
 }
@@ -20,39 +18,40 @@ body {
 }
 
 .scoreboard {
-  width: 1100px;
-  max-width: 96vw;
-  margin: 30px auto;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
   background: rgba(10, 10, 10, 0.94);
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
 }
 
 .league {
-  background: #111;
-  padding: 8px 20px;
   text-align: center;
   font-size: 20px;
-  font-weight: bold;
-  letter-spacing: 1px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  padding: 10px 20px;
+  background: #111;
+  border-bottom: 1px solid #333;
 }
 
 .match {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 220px 1fr;
   align-items: center;
-  justify-content: center;
-  padding: 14px 25px;
-  gap: 35px;
+  min-height: 145px;
+  padding: 20px 30px;
+  gap: 20px;
 }
 
 .team {
-  flex: 1;
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 18px;
   font-size: 24px;
-  font-weight: bold;
+  font-weight: 800;
 }
 
 .team.home {
@@ -66,132 +65,131 @@ body {
 }
 
 .crest {
-  width: 58px;
-  height: 58px;
-  min-width: 58px;
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
-  background: #555;
+  background: #222;
+  border: 2px solid #555;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 22px;
+  font-weight: 900;
+  flex-shrink: 0;
 }
 
 .score {
-  font-size: 48px;
-  font-weight: bold;
-  min-width: 45px;
+  font-size: 58px;
+  font-weight: 900;
+  line-height: 1;
+  min-width: 55px;
   text-align: center;
 }
 
 .center {
-  min-width: 130px;
   text-align: center;
+  position: relative;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .clock {
-  font-size: 30px;
-  font-weight: bold;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  font-size: 42px;
+  font-weight: 900;
+  line-height: 1;
+  transition: opacity 0.25s, transform 0.25s;
 }
 
 .period {
   font-size: 17px;
-  margin-top: 3px;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.period.hidden,
-.clock.hidden {
-  opacity: 0;
-  transform: translateY(-5px);
+  font-weight: 800;
+  margin-top: 7px;
+  letter-spacing: 1px;
+  transition: opacity 0.25s;
 }
 
 .halftime {
-  font-size: 20px;
-  font-weight: bold;
-  opacity: 0;
-  transform: translateY(5px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  position: absolute;
-  width: 130px;
-  margin-top: -22px;
-}
-
-.halftime.visible {
-  opacity: 1;
-  transform: translateY(0);
+  display: none;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  transition: opacity 0.25s, transform 0.25s;
 }
 
 .added-time {
-  font-size: 14px;
-  font-weight: bold;
-  margin-top: 2px;
-  opacity: 0;
-  transform: translateY(-4px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.added-time.visible {
-  opacity: 1;
-  transform: translateY(0);
+  min-height: 24px;
+  margin-top: 7px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  transition: opacity 0.25s, transform 0.25s;
 }
 
 .controls {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 8px;
-  padding: 10px;
-  background: rgba(255,255,255,0.08);
-  flex-wrap: wrap;
+  padding: 15px;
+  background: #151515;
+  border-top: 1px solid #333;
 }
 
 button {
-  border: none;
-  border-radius: 6px;
-  padding: 8px 13px;
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 13px;
+  background: #292929;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
-  font-weight: bold;
 }
 
 button:hover {
-  opacity: 0.85;
+  background: #3b3b3b;
 }
 
-@media (max-width: 700px) {
+button:active {
+  transform: scale(0.97);
+}
 
-  .scoreboard {
-    width: 96vw;
-  }
+.status {
+  text-align: center;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #aaa;
+  background: #0d0d0d;
+}
 
+@media (max-width: 800px) {
   .match {
-    gap: 10px;
-    padding: 12px;
+    grid-template-columns: 1fr 130px 1fr;
+    padding: 15px 10px;
+    gap: 8px;
   }
 
   .team {
-    font-size: 15px;
-    gap: 7px;
+    font-size: 16px;
+    gap: 8px;
   }
 
   .crest {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
+    width: 45px;
+    height: 45px;
+    font-size: 16px;
   }
 
   .score {
-    font-size: 34px;
-    min-width: 32px;
-  }
-
-  .center {
-    min-width: 70px;
+    font-size: 42px;
+    min-width: 40px;
   }
 
   .clock {
-    font-size: 22px;
+    font-size: 32px;
   }
 
   .period {
@@ -199,15 +197,9 @@ button:hover {
   }
 
   .halftime {
-    width: 70px;
-    font-size: 14px;
-  }
-
-  .added-time {
-    font-size: 11px;
+    font-size: 16px;
   }
 }
-
 </style>
 </head>
 
@@ -215,157 +207,303 @@ button:hover {
 
 <div class="scoreboard">
 
-  <div class="league">
-    LIGA UNIVERSITARIA
-  </div>
+  <div id="league" class="league">LIGA UNIVERSITARIA</div>
 
   <div class="match">
 
     <div class="team home">
-
-      <div>
-        EQUIPO LOCAL
-      </div>
-
-      <div class="crest">
-        A
-      </div>
-
-      <div id="homeScore" class="score">
-        0
-      </div>
-
+      <div id="homeName">EQUIPO LOCAL</div>
+      <div id="homeCrest" class="crest">A</div>
+      <div id="homeScore" class="score">0</div>
     </div>
-
 
     <div class="center">
 
-      <div id="clock" class="clock">
-        00:00
-      </div>
+      <div id="clock" class="clock">00:00</div>
 
-      <div id="period" class="period">
-        1T
-      </div>
+      <div id="period" class="period">1T</div>
 
-      <div id="halftime" class="halftime">
-        ENTRETIEMPO
-      </div>
+      <div id="halftime" class="halftime">ENTRETIEMPO</div>
 
-      <div id="addedTime" class="added-time">
-      </div>
+      <div id="addedTime" class="added-time"></div>
 
     </div>
 
-
     <div class="team away">
 
-      <div class="score" id="awayScore">
-        0
-      </div>
-
-      <div class="crest">
-        B
-      </div>
-
-      <div>
-        EQUIPO VISITANTE
-      </div>
+      <div id="awayScore" class="score">0</div>
+      <div id="awayCrest" class="crest">B</div>
+      <div id="awayName">EQUIPO VISITANTE</div>
 
     </div>
 
   </div>
 
-
   <div class="controls">
 
-    <button onclick="homeGoal()">
-      + Local
-    </button>
+    <button onclick="homeGoal()">+ Local</button>
+    <button onclick="awayGoal()">+ Visitante</button>
 
-    <button onclick="awayGoal()">
-      + Visitante
-    </button>
+    <button onclick="startClock()">▶ Iniciar</button>
+    <button onclick="pauseClock()">⏸ Pausar</button>
 
-    <button onclick="startClock()">
-      ▶ Iniciar
-    </button>
+    <button onclick="finishFirstHalf()">Finalizar 1T</button>
+    <button onclick="startSecondHalf()">Iniciar 2T</button>
+    <button onclick="finishMatch()">Finalizar partido</button>
 
-    <button onclick="pauseClock()">
-      ⏸ Pausar
-    </button>
+    <button onclick="showAddedTime(1)">+1</button>
+    <button onclick="showAddedTime(2)">+2</button>
+    <button onclick="showAddedTime(3)">+3</button>
+    <button onclick="showAddedTime(4)">+4</button>
+    <button onclick="showAddedTime(5)">+5</button>
 
-    <button onclick="finishFirstHalf()">
-      Finalizar 1T
-    </button>
+    <button onclick="hideAddedTime()">Ocultar adicional</button>
 
-    <button onclick="startSecondHalf()">
-      Iniciar 2T
-    </button>
+    <button onclick="resetMatch()">↺ Reiniciar</button>
 
-    <button onclick="finishMatch()">
-      Finalizar partido
-    </button>
+  </div>
 
-    <button onclick="showAddedTime(1)">
-      +1
-    </button>
-
-    <button onclick="showAddedTime(2)">
-      +2
-    </button>
-
-    <button onclick="showAddedTime(3)">
-      +3
-    </button>
-
-    <button onclick="showAddedTime(4)">
-      +4
-    </button>
-
-    <button onclick="showAddedTime(5)">
-      +5
-    </button>
-
-    <button onclick="hideAddedTime()">
-      Ocultar adicional
-    </button>
-
-    <button onclick="resetMatch()">
-      ↺ Reiniciar
-    </button>
-
+  <div id="status" class="status">
+    Conectando con Firebase...
   </div>
 
 </div>
 
 
-<script>
+<script type="module">
+
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+import {
+  getAuth,
+  signInAnonymously
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+import {
+  getDatabase,
+  ref,
+  onValue,
+  set
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+
+
+/* =========================
+   FIREBASE
+========================= */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBZO-xr8s1iXC6RrSYYX3VSaqEs_1Vnj80",
+  authDomain: "suenos-en-juego-marcador.firebaseapp.com",
+  projectId: "suenos-en-juego-marcador",
+  storageBucket: "suenos-en-juego-marcador.firebasestorage.app",
+  messagingSenderId: "199445224003",
+  appId: "1:199445224003:web:62102f321ceb14231d52f6",
+  databaseURL: "https://suenos-en-juego-marcador-default-rtdb.firebaseio.com"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getDatabase(app);
+
+
+/* =========================
+   PARTIDO
+========================= */
+
+const params = new URLSearchParams(window.location.search);
+
+const partidoNumero = params.get("partido") || "1";
+
+const matchRef = ref(
+  db,
+  "matches/partido" + partidoNumero
+);
+
+
+/* =========================
+   ESTADO LOCAL
+========================= */
 
 let home = 0;
 let away = 0;
 
 let seconds = 0;
+
 let running = false;
-let timer = null;
 
 let currentPeriod = "1T";
 
+let addedTime = null;
 
-function updateScore() {
+let timer = null;
 
-  document.getElementById("homeScore").textContent = home;
-  document.getElementById("awayScore").textContent = away;
+let updatingFromFirebase = false;
 
+
+/* =========================
+   ELEMENTOS
+========================= */
+
+const homeScoreElement =
+  document.getElementById("homeScore");
+
+const awayScoreElement =
+  document.getElementById("awayScore");
+
+const clockElement =
+  document.getElementById("clock");
+
+const periodElement =
+  document.getElementById("period");
+
+const halftimeElement =
+  document.getElementById("halftime");
+
+const addedTimeElement =
+  document.getElementById("addedTime");
+
+const statusElement =
+  document.getElementById("status");
+
+const leagueElement =
+  document.getElementById("league");
+
+const homeNameElement =
+  document.getElementById("homeName");
+
+const awayNameElement =
+  document.getElementById("awayName");
+
+const homeCrestElement =
+  document.getElementById("homeCrest");
+
+const awayCrestElement =
+  document.getElementById("awayCrest");
+
+
+/* =========================
+   MOSTRAR ESTADO
+========================= */
+
+function updateScreen() {
+
+  homeScoreElement.textContent = home;
+
+  awayScoreElement.textContent = away;
+
+  updateClock();
+
+  if (currentPeriod === "ENTRETIEMPO") {
+
+    clockElement.style.display = "none";
+    periodElement.style.display = "none";
+
+    halftimeElement.textContent = "ENTRETIEMPO";
+    halftimeElement.style.display = "block";
+
+  } else if (currentPeriod === "FINAL") {
+
+    clockElement.style.display = "none";
+    periodElement.style.display = "none";
+
+    halftimeElement.textContent = "FINAL";
+    halftimeElement.style.display = "block";
+
+  } else {
+
+    clockElement.style.display = "block";
+    periodElement.style.display = "block";
+
+    halftimeElement.style.display = "none";
+
+    periodElement.textContent = currentPeriod;
+  }
+
+  if (addedTime !== null) {
+
+    addedTimeElement.textContent =
+      "+" + addedTime + " adicional";
+
+  } else {
+
+    addedTimeElement.textContent = "";
+  }
 }
 
+
+/* =========================
+   RELOJ
+========================= */
+
+function updateClock() {
+
+  const minutes =
+    Math.floor(seconds / 60);
+
+  const secs =
+    seconds % 60;
+
+  clockElement.textContent =
+    String(minutes).padStart(2, "0") +
+    ":" +
+    String(secs).padStart(2, "0");
+}
+
+
+/* =========================
+   GUARDAR FIREBASE
+========================= */
+
+async function saveState() {
+
+  if (updatingFromFirebase) return;
+
+  await set(matchRef, {
+
+    league: leagueElement.textContent,
+
+    homeName:
+      homeNameElement.textContent,
+
+    awayName:
+      awayNameElement.textContent,
+
+    homeCrest:
+      homeCrestElement.textContent,
+
+    awayCrest:
+      awayCrestElement.textContent,
+
+    homeScore: home,
+
+    awayScore: away,
+
+    seconds: seconds,
+
+    running: running,
+
+    period: currentPeriod,
+
+    addedTime: addedTime
+
+  });
+}
+
+
+/* =========================
+   GOLES
+========================= */
 
 function homeGoal() {
 
   home++;
 
-  updateScore();
+  updateScreen();
 
+  saveState();
 }
 
 
@@ -373,43 +511,48 @@ function awayGoal() {
 
   away++;
 
-  updateScore();
+  updateScreen();
 
+  saveState();
 }
 
 
-function updateClock() {
-
-  let minutes = Math.floor(seconds / 60);
-  let secs = seconds % 60;
-
-  document.getElementById("clock").textContent =
-    String(minutes).padStart(2, "0") + ":" +
-    String(secs).padStart(2, "0");
-
-}
-
+/* =========================
+   INICIAR RELOJ
+========================= */
 
 function startClock() {
 
   if (running) return;
 
-  if (currentPeriod === "ENTRETIEMPO") return;
-
-  if (currentPeriod === "FINAL") return;
+  if (
+    currentPeriod === "ENTRETIEMPO" ||
+    currentPeriod === "FINAL"
+  ) {
+    return;
+  }
 
   running = true;
 
-  timer = setInterval(function() {
+  updateScreen();
+
+  saveState();
+
+  timer = setInterval(() => {
 
     seconds++;
 
     updateClock();
 
-  }, 1000);
+    saveState();
 
+  }, 1000);
 }
 
+
+/* =========================
+   PAUSAR
+========================= */
 
 function pauseClock() {
 
@@ -417,8 +560,15 @@ function pauseClock() {
 
   clearInterval(timer);
 
+  timer = null;
+
+  saveState();
 }
 
+
+/* =========================
+   FINALIZAR 1T
+========================= */
 
 function finishFirstHalf() {
 
@@ -426,43 +576,45 @@ function finishFirstHalf() {
 
   currentPeriod = "ENTRETIEMPO";
 
-  document.getElementById("clock").classList.add("hidden");
-  document.getElementById("period").classList.add("hidden");
+  updateScreen();
 
-  setTimeout(function() {
-
-    document.getElementById("halftime").classList.add("visible");
-
-  }, 150);
-
+  saveState();
 }
 
 
+/* =========================
+   INICIAR 2T
+========================= */
+
 function startSecondHalf() {
 
-  pauseClock();
+  clearInterval(timer);
+
+  timer = null;
+
+  running = false;
 
   currentPeriod = "2T";
 
   seconds = 45 * 60;
 
-  document.getElementById("halftime").classList.remove("visible");
+  addedTime = null;
 
-  setTimeout(function() {
+  updateScreen();
 
-    document.getElementById("clock").classList.remove("hidden");
-    document.getElementById("period").classList.remove("hidden");
+  saveState();
 
-    document.getElementById("period").textContent = "2T";
-
-    updateClock();
+  setTimeout(() => {
 
     startClock();
 
   }, 300);
-
 }
 
+
+/* =========================
+   FINALIZAR PARTIDO
+========================= */
 
 function finishMatch() {
 
@@ -470,65 +622,162 @@ function finishMatch() {
 
   currentPeriod = "FINAL";
 
-  document.getElementById("clock").classList.add("hidden");
-  document.getElementById("period").classList.add("hidden");
+  updateScreen();
 
-  document.getElementById("halftime").textContent = "FINAL";
-
-  setTimeout(function() {
-
-    document.getElementById("halftime").classList.add("visible");
-
-  }, 150);
-
+  saveState();
 }
 
 
+/* =========================
+   TIEMPO ADICIONAL
+========================= */
+
 function showAddedTime(minutes) {
 
-  document.getElementById("addedTime").textContent = "+" + minutes;
+  addedTime = minutes;
 
-  document.getElementById("addedTime").classList.add("visible");
+  updateScreen();
 
+  saveState();
 }
 
 
 function hideAddedTime() {
 
-  document.getElementById("addedTime").classList.remove("visible");
+  addedTime = null;
 
+  updateScreen();
+
+  saveState();
 }
 
 
+/* =========================
+   REINICIAR
+========================= */
+
 function resetMatch() {
 
-  pauseClock();
+  clearInterval(timer);
+
+  timer = null;
 
   home = 0;
+
   away = 0;
 
   seconds = 0;
 
+  running = false;
+
   currentPeriod = "1T";
 
-  document.getElementById("period").textContent = "1T";
+  addedTime = null;
 
-  document.getElementById("clock").classList.remove("hidden");
-  document.getElementById("period").classList.remove("hidden");
+  updateScreen();
 
-  document.getElementById("halftime").classList.remove("visible");
-  document.getElementById("halftime").textContent = "ENTRETIEMPO";
-
-  hideAddedTime();
-
-  updateScore();
-  updateClock();
-
+  saveState();
 }
 
 
-updateScore();
-updateClock();
+/* =========================
+   FIREBASE
+========================= */
+
+signInAnonymously(auth)
+
+  .then(() => {
+
+    statusElement.textContent =
+      "Firebase conectado · Partido " +
+      partidoNumero;
+
+    onValue(matchRef, (snapshot) => {
+
+      const data = snapshot.val();
+
+      if (!data) {
+
+        saveState();
+
+        return;
+      }
+
+      updatingFromFirebase = true;
+
+      home =
+        data.homeScore ?? 0;
+
+      away =
+        data.awayScore ?? 0;
+
+      seconds =
+        data.seconds ?? 0;
+
+      running =
+        data.running ?? false;
+
+      currentPeriod =
+        data.period ?? "1T";
+
+      addedTime =
+        data.addedTime ?? null;
+
+
+      if (data.league) {
+
+        leagueElement.textContent =
+          data.league;
+      }
+
+      if (data.homeName) {
+
+        homeNameElement.textContent =
+          data.homeName;
+      }
+
+      if (data.awayName) {
+
+        awayNameElement.textContent =
+          data.awayName;
+      }
+
+      if (data.homeCrest) {
+
+        homeCrestElement.textContent =
+          data.homeCrest;
+      }
+
+      if (data.awayCrest) {
+
+        awayCrestElement.textContent =
+          data.awayCrest;
+      }
+
+
+      updateScreen();
+
+      updatingFromFirebase = false;
+
+    });
+
+  })
+
+  .catch((error) => {
+
+    console.error(error);
+
+    statusElement.textContent =
+      "Error al conectar con Firebase";
+
+  });
+
+
+/* =========================
+   INICIO
+========================= */
+
+updateScreen();
 
 </script>
 
