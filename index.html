@@ -7,6 +7,7 @@
 <title>Marcador Liga Universitaria</title>
 
 <style>
+
 * {
   box-sizing: border-box;
 }
@@ -19,10 +20,10 @@ body {
 }
 
 .scoreboard {
-  width: 900px;
-  max-width: 95vw;
+  width: 1100px;
+  max-width: 96vw;
   margin: 30px auto;
-  background: rgba(10, 10, 10, 0.92);
+  background: rgba(10, 10, 10, 0.94);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0,0,0,0.35);
@@ -30,9 +31,9 @@ body {
 
 .league {
   background: #111;
-  padding: 10px 20px;
+  padding: 8px 20px;
   text-align: center;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
   letter-spacing: 1px;
 }
@@ -41,35 +42,51 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 14px 25px;
   gap: 35px;
-  padding: 20px;
 }
 
 .team {
-  width: 250px;
-  text-align: center;
-  font-size: 25px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 24px;
   font-weight: bold;
+}
+
+.team.home {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.team.away {
+  justify-content: flex-start;
+  text-align: left;
 }
 
 .crest {
-  width: 65px;
-  height: 65px;
+  width: 58px;
+  height: 58px;
+  min-width: 58px;
   border-radius: 50%;
   background: #555;
-  margin: 0 auto 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-}
-
-.score {
-  font-size: 55px;
+  font-size: 16px;
   font-weight: bold;
 }
 
+.score {
+  font-size: 48px;
+  font-weight: bold;
+  min-width: 45px;
+  text-align: center;
+}
+
 .center {
+  min-width: 115px;
   text-align: center;
 }
 
@@ -79,25 +96,66 @@ body {
 }
 
 .period {
-  font-size: 18px;
-  margin-top: 4px;
+  font-size: 17px;
+  margin-top: 3px;
 }
 
 .controls {
   display: flex;
   justify-content: center;
   gap: 8px;
-  padding: 12px;
+  padding: 10px;
   background: rgba(255,255,255,0.08);
 }
 
 button {
   border: none;
   border-radius: 6px;
-  padding: 9px 14px;
+  padding: 8px 13px;
   cursor: pointer;
   font-weight: bold;
 }
+
+@media (max-width: 700px) {
+
+  .scoreboard {
+    width: 96vw;
+  }
+
+  .match {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .team {
+    font-size: 15px;
+    gap: 7px;
+  }
+
+  .crest {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+  }
+
+  .score {
+    font-size: 34px;
+    min-width: 32px;
+  }
+
+  .center {
+    min-width: 70px;
+  }
+
+  .clock {
+    font-size: 22px;
+  }
+
+  .period {
+    font-size: 14px;
+  }
+}
+
 </style>
 </head>
 
@@ -111,34 +169,81 @@ button {
 
   <div class="match">
 
-    <div class="team">
-      <div class="crest">A</div>
-      EQUIPO LOCAL
-      <div id="homeScore" class="score">0</div>
+    <div class="team home">
+
+      <div>
+        EQUIPO LOCAL
+      </div>
+
+      <div class="crest">
+        A
+      </div>
+
+      <div id="homeScore" class="score">
+        0
+      </div>
+
     </div>
+
 
     <div class="center">
-      <div id="clock" class="clock">00:00</div>
-      <div id="period" class="period">1T</div>
+
+      <div id="clock" class="clock">
+        00:00
+      </div>
+
+      <div id="period" class="period">
+        1T
+      </div>
+
     </div>
 
-    <div class="team">
-      <div class="crest">B</div>
-      EQUIPO VISITANTE
-      <div id="awayScore" class="score">0</div>
+
+    <div class="team away">
+
+      <div class="score" id="awayScore">
+        0
+      </div>
+
+      <div class="crest">
+        B
+      </div>
+
+      <div>
+        EQUIPO VISITANTE
+      </div>
+
     </div>
 
   </div>
 
+
   <div class="controls">
-    <button onclick="homeGoal()">+ Local</button>
-    <button onclick="awayGoal()">+ Visitante</button>
-    <button onclick="startClock()">▶ Iniciar</button>
-    <button onclick="pauseClock()">⏸ Pausar</button>
-    <button onclick="resetClock()">↺ Reiniciar</button>
+
+    <button onclick="homeGoal()">
+      + Local
+    </button>
+
+    <button onclick="awayGoal()">
+      + Visitante
+    </button>
+
+    <button onclick="startClock()">
+      ▶ Iniciar
+    </button>
+
+    <button onclick="pauseClock()">
+      ⏸ Pausar
+    </button>
+
+    <button onclick="resetClock()">
+      ↺ Reiniciar
+    </button>
+
   </div>
 
 </div>
+
 
 <script>
 
@@ -149,20 +254,32 @@ let seconds = 0;
 let running = false;
 let timer = null;
 
+
 function updateScore() {
+
   document.getElementById("homeScore").textContent = home;
   document.getElementById("awayScore").textContent = away;
+
 }
+
 
 function homeGoal() {
+
   home++;
+
   updateScore();
+
 }
 
+
 function awayGoal() {
+
   away++;
+
   updateScore();
+
 }
+
 
 function updateClock() {
 
@@ -172,7 +289,9 @@ function updateClock() {
   document.getElementById("clock").textContent =
     String(minutes).padStart(2, "0") + ":" +
     String(secs).padStart(2, "0");
+
 }
+
 
 function startClock() {
 
@@ -181,17 +300,24 @@ function startClock() {
   running = true;
 
   timer = setInterval(function() {
+
     seconds++;
+
     updateClock();
+
   }, 1000);
+
 }
+
 
 function pauseClock() {
 
   running = false;
 
   clearInterval(timer);
+
 }
+
 
 function resetClock() {
 
@@ -201,8 +327,17 @@ function resetClock() {
 
   seconds = 0;
 
+  home = 0;
+  away = 0;
+
+  updateScore();
   updateClock();
+
 }
+
+
+updateClock();
+updateScore();
 
 </script>
 
