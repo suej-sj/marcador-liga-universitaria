@@ -86,18 +86,56 @@ body {
 }
 
 .center {
-  min-width: 115px;
+  min-width: 130px;
   text-align: center;
 }
 
 .clock {
   font-size: 30px;
   font-weight: bold;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .period {
   font-size: 17px;
   margin-top: 3px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.period.hidden,
+.clock.hidden {
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+.halftime {
+  font-size: 20px;
+  font-weight: bold;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  position: absolute;
+  width: 130px;
+  margin-top: -22px;
+}
+
+.halftime.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.added-time {
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 2px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.added-time.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .controls {
@@ -106,6 +144,7 @@ body {
   gap: 8px;
   padding: 10px;
   background: rgba(255,255,255,0.08);
+  flex-wrap: wrap;
 }
 
 button {
@@ -114,6 +153,10 @@ button {
   padding: 8px 13px;
   cursor: pointer;
   font-weight: bold;
+}
+
+button:hover {
+  opacity: 0.85;
 }
 
 @media (max-width: 700px) {
@@ -153,6 +196,15 @@ button {
 
   .period {
     font-size: 14px;
+  }
+
+  .halftime {
+    width: 70px;
+    font-size: 14px;
+  }
+
+  .added-time {
+    font-size: 11px;
   }
 }
 
@@ -196,6 +248,13 @@ button {
         1T
       </div>
 
+      <div id="halftime" class="halftime">
+        ENTRETIEMPO
+      </div>
+
+      <div id="addedTime" class="added-time">
+      </div>
+
     </div>
 
 
@@ -236,7 +295,43 @@ button {
       ⏸ Pausar
     </button>
 
-    <button onclick="resetClock()">
+    <button onclick="finishFirstHalf()">
+      Finalizar 1T
+    </button>
+
+    <button onclick="startSecondHalf()">
+      Iniciar 2T
+    </button>
+
+    <button onclick="finishMatch()">
+      Finalizar partido
+    </button>
+
+    <button onclick="showAddedTime(1)">
+      +1
+    </button>
+
+    <button onclick="showAddedTime(2)">
+      +2
+    </button>
+
+    <button onclick="showAddedTime(3)">
+      +3
+    </button>
+
+    <button onclick="showAddedTime(4)">
+      +4
+    </button>
+
+    <button onclick="showAddedTime(5)">
+      +5
+    </button>
+
+    <button onclick="hideAddedTime()">
+      Ocultar adicional
+    </button>
+
+    <button onclick="resetMatch()">
       ↺ Reiniciar
     </button>
 
@@ -253,6 +348,8 @@ let away = 0;
 let seconds = 0;
 let running = false;
 let timer = null;
+
+let currentPeriod = "1T";
 
 
 function updateScore() {
@@ -297,6 +394,10 @@ function startClock() {
 
   if (running) return;
 
+  if (currentPeriod === "ENTRETIEMPO") return;
+
+  if (currentPeriod === "FINAL") return;
+
   running = true;
 
   timer = setInterval(function() {
@@ -319,16 +420,106 @@ function pauseClock() {
 }
 
 
-function resetClock() {
+function finishFirstHalf() {
 
-  running = false;
+  pauseClock();
 
-  clearInterval(timer);
+  currentPeriod = "ENTRETIEMPO";
 
-  seconds = 0;
+  document.getElementById("clock").classList.add("hidden");
+  document.getElementById("period").classList.add("hidden");
+
+  setTimeout(function() {
+
+    document.getElementById("halftime").classList.add("visible");
+
+  }, 150);
+
+}
+
+
+function startSecondHalf() {
+
+  pauseClock();
+
+  currentPeriod = "2T";
+
+  seconds = 45 * 60;
+
+  document.getElementById("halftime").classList.remove("visible");
+
+  setTimeout(function() {
+
+    document.getElementById("clock").classList.remove("hidden");
+    document.getElementById("period").classList.remove("hidden");
+
+    document.getElementById("period").textContent = "2T";
+
+    updateClock();
+
+    startClock();
+
+  }, 300);
+
+}
+
+
+function finishMatch() {
+
+  pauseClock();
+
+  currentPeriod = "FINAL";
+
+  document.getElementById("clock").classList.add("hidden");
+  document.getElementById("period").classList.add("hidden");
+
+  document.getElementById("halftime").textContent = "FINAL";
+
+  setTimeout(function() {
+
+    document.getElementById("halftime").classList.add("visible");
+
+  }, 150);
+
+}
+
+
+function showAddedTime(minutes) {
+
+  document.getElementById("addedTime").textContent = "+" + minutes;
+
+  document.getElementById("addedTime").classList.add("visible");
+
+}
+
+
+function hideAddedTime() {
+
+  document.getElementById("addedTime").classList.remove("visible");
+
+}
+
+
+function resetMatch() {
+
+  pauseClock();
 
   home = 0;
   away = 0;
+
+  seconds = 0;
+
+  currentPeriod = "1T";
+
+  document.getElementById("period").textContent = "1T";
+
+  document.getElementById("clock").classList.remove("hidden");
+  document.getElementById("period").classList.remove("hidden");
+
+  document.getElementById("halftime").classList.remove("visible");
+  document.getElementById("halftime").textContent = "ENTRETIEMPO";
+
+  hideAddedTime();
 
   updateScore();
   updateClock();
@@ -336,8 +527,8 @@ function resetClock() {
 }
 
 
-updateClock();
 updateScore();
+updateClock();
 
 </script>
 
