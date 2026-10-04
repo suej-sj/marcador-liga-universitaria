@@ -288,9 +288,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
-
 const db = firebase.database();
-
 
 const params = new URLSearchParams(window.location.search);
 
@@ -301,8 +299,13 @@ const matchRef =
   db.ref("matches/partido" + partidoNumero);
 
 
+/* =========================
+   ESTADO DEL PARTIDO
+========================= */
+
 let home = 0;
 let away = 0;
+
 let seconds = 0;
 
 let running = false;
@@ -311,10 +314,16 @@ let currentPeriod = "1T";
 
 let addedTime = null;
 
+let clockStartedAt = null;
+
 let timer = null;
 
 let loadingFirebase = true;
 
+
+/* =========================
+   ELEMENTOS
+========================= */
 
 const homeScoreElement =
   document.getElementById("homeScore");
@@ -353,19 +362,65 @@ const awayCrestElement =
   document.getElementById("awayCrest");
 
 
+/* =========================
+   RELOJ
+========================= */
+
+function getCurrentSeconds() {
+
+  if (!running || !clockStartedAt) {
+    return seconds;
+  }
+
+  const elapsed =
+    Math.floor(
+      (Date.now() - clockStartedAt) / 1000
+    );
+
+  return seconds + Math.max(0, elapsed);
+}
+
+
+function updateClock() {
+
+  const currentSeconds =
+    getCurrentSeconds();
+
+  const minutes =
+    Math.floor(currentSeconds / 60);
+
+  const secs =
+    currentSeconds % 60;
+
+  clockElement.textContent =
+    String(minutes).padStart(2, "0") +
+    ":" +
+    String(secs).padStart(2, "0");
+}
+
+
+/* =========================
+   PANTALLA
+========================= */
+
 function updateScreen() {
 
-  homeScoreElement.textContent = home;
+  homeScoreElement.textContent =
+    home;
 
-  awayScoreElement.textContent = away;
+  awayScoreElement.textContent =
+    away;
 
   updateClock();
 
+
   if (currentPeriod === "ENTRETIEMPO") {
 
-    clockElement.style.display = "none";
+    clockElement.style.display =
+      "none";
 
-    periodElement.style.display = "none";
+    periodElement.style.display =
+      "none";
 
     halftimeElement.textContent =
       "ENTRETIEMPO";
@@ -375,9 +430,11 @@ function updateScreen() {
 
   } else if (currentPeriod === "FINAL") {
 
-    clockElement.style.display = "none";
+    clockElement.style.display =
+      "none";
 
-    periodElement.style.display = "none";
+    periodElement.style.display =
+      "none";
 
     halftimeElement.textContent =
       "FINAL";
@@ -400,6 +457,7 @@ function updateScreen() {
       currentPeriod;
   }
 
+
   if (addedTime !== null) {
 
     addedTimeElement.textContent =
@@ -407,29 +465,50 @@ function updateScreen() {
 
   } else {
 
-    addedTimeElement.textContent = "";
+    addedTimeElement.textContent =
+      "";
   }
 }
 
 
-function updateClock() {
+/* =========================
+   TIMER LOCAL
+========================= */
 
-  const minutes =
-    Math.floor(seconds / 60);
+function stopLocalTimer() {
 
-  const secs =
-    seconds % 60;
+  if (timer !== null) {
 
-  clockElement.textContent =
-    String(minutes).padStart(2, "0") +
-    ":" +
-    String(secs).padStart(2, "0");
+    clearInterval(timer);
+
+    timer = null;
+  }
 }
 
 
-function saveState() {
+function startLocalTimer() {
 
-  return matchRef.set({
+  stopLocalTimer();
+
+  if (!running || !clockStartedAt) {
+    return;
+  }
+
+  timer = setInterval(function() {
+
+    updateClock();
+
+  }, 250);
+}
+
+
+/* =========================
+   GUARDAR ESTADO
+========================= */
+
+function saveState(extraData) {
+
+  const baseData = {
 
     league:
       leagueElement.textContent,
@@ -446,49 +525,93 @@ function saveState() {
     awayCrest:
       awayCrestElement.textContent,
 
-    homeScore: home,
+    homeScore:
+      home,
 
-    awayScore: away,
+    awayScore:
+      away,
 
-    seconds: seconds,
+    seconds:
+      seconds,
 
-    running: running,
+    running:
+      running,
 
-    period: currentPeriod,
+    period:
+      currentPeriod,
 
-    addedTime: addedTime
+    addedTime:
+      addedTime,
 
-  });
+    clockStartedAt:
+      clockStartedAt
+  };
+
+
+  if (extraData) {
+
+    Object.assign(
+      baseData,
+      extraData
+    );
+  }
+
+
+  return matchRef.update(
+    baseData
+  );
 }
 
 
+/* =========================
+   GOLES
+========================= */
+
 function homeGoal() {
 
-  home++;
-
-  updateScreen();
-
-  if (!loadingFirebase) {
-    saveState();
+  if (loadingFirebase) {
+    return;
   }
+
+  matchRef
+    .child("homeScore")
+    .transaction(function(currentValue) {
+
+      return (currentValue || 0) + 1;
+
+    });
 }
 
 
 function awayGoal() {
 
-  away++;
-
-  updateScreen();
-
-  if (!loadingFirebase) {
-    saveState();
+  if (loadingFirebase) {
+    return;
   }
+
+  matchRef
+    .child("awayScore")
+    .transaction(function(currentValue) {
+
+      return (currentValue || 0) + 1;
+
+    });
 }
 
 
+/* =========================
+   INICIAR RELOJ
+========================= */
+
 function startClock() {
 
-  if (running) return;
+  if (loadingFirebase) {
+    return;
+  }
+
+  if (running) {
+    return;
+  }
 
   if (
     currentPeriod === "ENTRETIEMPO" ||
@@ -497,273 +620,180 @@ function startClock() {
     return;
   }
 
+
   running = true;
+
+  clockStartedAt =
+    Date.now();
+
 
   updateScreen();
 
-  if (!loadingFirebase) {
-    saveState();
-  }
+  startLocalTimer();
 
-  timer = setInterval(function() {
 
-    seconds++;
+  matchRef.update({
 
-    updateClock();
+    running:
+      true,
 
-    if (!loadingFirebase) {
-      saveState();
-    }
+    seconds:
+      seconds,
 
-  }, 1000);
+    clockStartedAt:
+      firebase.database.ServerValue.TIMESTAMP
+
+  });
 }
 
+
+/* =========================
+   PAUSAR RELOJ
+========================= */
 
 function pauseClock() {
 
+  if (loadingFirebase) {
+    return;
+  }
+
+
+  if (!running) {
+    return;
+  }
+
+
+  seconds =
+    getCurrentSeconds();
+
   running = false;
 
-  clearInterval(timer);
+  clockStartedAt = null;
 
-  timer = null;
 
-  if (!loadingFirebase) {
-    saveState();
-  }
+  stopLocalTimer();
+
+  updateScreen();
+
+
+  matchRef.update({
+
+    seconds:
+      seconds,
+
+    running:
+      false,
+
+    clockStartedAt:
+      null
+
+  });
 }
 
 
+/* =========================
+   FINALIZAR PRIMER TIEMPO
+========================= */
+
 function finishFirstHalf() {
 
-  pauseClock();
+  if (loadingFirebase) {
+    return;
+  }
+
+
+  if (running) {
+
+    seconds =
+      getCurrentSeconds();
+  }
+
+
+  running = false;
+
+  clockStartedAt = null;
+
+  stopLocalTimer();
+
 
   currentPeriod =
     "ENTRETIEMPO";
 
+
   updateScreen();
 
-  if (!loadingFirebase) {
-    saveState();
-  }
+
+  matchRef.update({
+
+    seconds:
+      seconds,
+
+    running:
+      false,
+
+    clockStartedAt:
+      null,
+
+    period:
+      "ENTRETIEMPO"
+
+  });
 }
 
+
+/* =========================
+   INICIAR SEGUNDO TIEMPO
+========================= */
 
 function startSecondHalf() {
 
-  clearInterval(timer);
+  if (loadingFirebase) {
+    return;
+  }
 
-  timer = null;
 
-  running = false;
+  stopLocalTimer();
 
-  currentPeriod = "2T";
 
-  seconds = 45 * 60;
+  seconds =
+    45 * 60;
 
-  addedTime = null;
+  currentPeriod =
+    "2T";
+
+  addedTime =
+    null;
+
+  running =
+    true;
+
+  clockStartedAt =
+    Date.now();
+
 
   updateScreen();
 
-  if (!loadingFirebase) {
-    saveState();
-  }
+  startLocalTimer();
 
-  setTimeout(function() {
 
-    startClock();
+  matchRef.update({
 
-  }, 300);
-}
+    seconds:
+      45 * 60,
 
+    period:
+      "2T",
 
-function finishMatch() {
+    addedTime:
+      null,
 
-  pauseClock();
+    running:
+      true,
 
-  currentPeriod = "FINAL";
-
-  updateScreen();
-
-  if (!loadingFirebase) {
-    saveState();
-  }
-}
-
-
-function showAddedTime(minutes) {
-
-  addedTime = minutes;
-
-  updateScreen();
-
-  if (!loadingFirebase) {
-    saveState();
-  }
-}
-
-
-function hideAddedTime() {
-
-  addedTime = null;
-
-  updateScreen();
-
-  if (!loadingFirebase) {
-    saveState();
-  }
-}
-
-
-function resetMatch() {
-
-  clearInterval(timer);
-
-  timer = null;
-
-  home = 0;
-
-  away = 0;
-
-  seconds = 0;
-
-  running = false;
-
-  currentPeriod = "1T";
-
-  addedTime = null;
-
-  updateScreen();
-
-  if (!loadingFirebase) {
-    saveState();
-  }
-}
-
-
-auth.signInAnonymously()
-
-  .then(function() {
-
-    statusElement.textContent =
-      "Firebase conectado · Partido " +
-      partidoNumero;
-
-    matchRef.on("value", function(snapshot) {
-
-      const data = snapshot.val();
-
-      if (!data) {
-
-        loadingFirebase = false;
-
-        saveState();
-
-        return;
-      }
-
-      clearInterval(timer);
-
-      timer = null;
-
-      home =
-        data.homeScore || 0;
-
-      away =
-        data.awayScore || 0;
-
-      seconds =
-        data.seconds || 0;
-
-      running =
-        data.running || false;
-
-      currentPeriod =
-        data.period || "1T";
-
-      addedTime =
-        data.addedTime ?? null;
-
-
-      if (data.league) {
-
-        leagueElement.textContent =
-          data.league;
-      }
-
-      if (data.homeName) {
-
-        homeNameElement.textContent =
-          data.homeName;
-      }
-
-      if (data.awayName) {
-
-        awayNameElement.textContent =
-          data.awayName;
-      }
-
-      if (data.homeCrest) {
-
-        homeCrestElement.textContent =
-          data.homeCrest;
-      }
-
-      if (data.awayCrest) {
-
-        awayCrestElement.textContent =
-          data.awayCrest;
-      }
-
-
-      updateScreen();
-
-      loadingFirebase = false;
-
-      if (running) {
-
-        timer = setInterval(function() {
-
-          seconds++;
-
-          updateClock();
-
-        }, 1000);
-      }
-
-    });
-
-  })
-
-  .catch(function(error) {
-
-    console.error(error);
-
-    statusElement.textContent =
-      "Error al conectar con Firebase";
+    clockStartedAt:
+      firebase.database.ServerValue.TIMESTAMP
 
   });
-
-
-updateScreen();
-
-</script>
-
-</body>
-</html>rrentPeriod = "2T";
-
-  seconds = 45 * 60;
-
-  addedTime = null;
-
-  updateScreen();
-
-  saveState();
-
-  setTimeout(() => {
-
-    startClock();
-
-  }, 300);
 }
 
 
@@ -773,13 +803,47 @@ updateScreen();
 
 function finishMatch() {
 
-  pauseClock();
+  if (loadingFirebase) {
+    return;
+  }
 
-  currentPeriod = "FINAL";
+
+  if (running) {
+
+    seconds =
+      getCurrentSeconds();
+  }
+
+
+  running = false;
+
+  clockStartedAt = null;
+
+  stopLocalTimer();
+
+
+  currentPeriod =
+    "FINAL";
+
 
   updateScreen();
 
-  saveState();
+
+  matchRef.update({
+
+    seconds:
+      seconds,
+
+    running:
+      false,
+
+    clockStartedAt:
+      null,
+
+    period:
+      "FINAL"
+
+  });
 }
 
 
@@ -789,21 +853,47 @@ function finishMatch() {
 
 function showAddedTime(minutes) {
 
-  addedTime = minutes;
+  if (loadingFirebase) {
+    return;
+  }
+
+
+  addedTime =
+    minutes;
+
 
   updateScreen();
 
-  saveState();
+
+  matchRef.update({
+
+    addedTime:
+      minutes
+
+  });
 }
 
 
 function hideAddedTime() {
 
-  addedTime = null;
+  if (loadingFirebase) {
+    return;
+  }
+
+
+  addedTime =
+    null;
+
 
   updateScreen();
 
-  saveState();
+
+  matchRef.update({
+
+    addedTime:
+      null
+
+  });
 }
 
 
@@ -813,9 +903,13 @@ function hideAddedTime() {
 
 function resetMatch() {
 
-  clearInterval(timer);
+  if (loadingFirebase) {
+    return;
+  }
 
-  timer = null;
+
+  stopLocalTimer();
+
 
   home = 0;
 
@@ -829,98 +923,156 @@ function resetMatch() {
 
   addedTime = null;
 
+  clockStartedAt = null;
+
+
   updateScreen();
 
-  saveState();
+
+  matchRef.update({
+
+    homeScore:
+      0,
+
+    awayScore:
+      0,
+
+    seconds:
+      0,
+
+    running:
+      false,
+
+    period:
+      "1T",
+
+    addedTime:
+      null,
+
+    clockStartedAt:
+      null
+
+  });
 }
 
 
 /* =========================
-   FIREBASE
+   CONEXIÓN FIREBASE
 ========================= */
 
-signInAnonymously(auth)
+auth.signInAnonymously()
 
-  .then(() => {
+  .then(function() {
 
     statusElement.textContent =
       "Firebase conectado · Partido " +
       partidoNumero;
 
-    onValue(matchRef, (snapshot) => {
 
-      const data = snapshot.val();
+    matchRef.on(
+      "value",
+      function(snapshot) {
 
-      if (!data) {
+        const data =
+          snapshot.val();
 
-        saveState();
 
-        return;
+        if (!data) {
+
+          loadingFirebase =
+            false;
+
+
+          saveState();
+
+          return;
+        }
+
+
+        home =
+          data.homeScore ?? 0;
+
+        away =
+          data.awayScore ?? 0;
+
+        seconds =
+          data.seconds ?? 0;
+
+        running =
+          data.running ?? false;
+
+        currentPeriod =
+          data.period ?? "1T";
+
+        addedTime =
+          data.addedTime ?? null;
+
+        clockStartedAt =
+          data.clockStartedAt ?? null;
+
+
+        if (data.league) {
+
+          leagueElement.textContent =
+            data.league;
+        }
+
+
+        if (data.homeName) {
+
+          homeNameElement.textContent =
+            data.homeName;
+        }
+
+
+        if (data.awayName) {
+
+          awayNameElement.textContent =
+            data.awayName;
+        }
+
+
+        if (data.homeCrest) {
+
+          homeCrestElement.textContent =
+            data.homeCrest;
+        }
+
+
+        if (data.awayCrest) {
+
+          awayCrestElement.textContent =
+            data.awayCrest;
+        }
+
+
+        updateScreen();
+
+
+        loadingFirebase =
+          false;
+
+
+        if (running) {
+
+          startLocalTimer();
+
+        } else {
+
+          stopLocalTimer();
+
+        }
+
       }
-
-      updatingFromFirebase = true;
-
-      home =
-        data.homeScore ?? 0;
-
-      away =
-        data.awayScore ?? 0;
-
-      seconds =
-        data.seconds ?? 0;
-
-      running =
-        data.running ?? false;
-
-      currentPeriod =
-        data.period ?? "1T";
-
-      addedTime =
-        data.addedTime ?? null;
-
-
-      if (data.league) {
-
-        leagueElement.textContent =
-          data.league;
-      }
-
-      if (data.homeName) {
-
-        homeNameElement.textContent =
-          data.homeName;
-      }
-
-      if (data.awayName) {
-
-        awayNameElement.textContent =
-          data.awayName;
-      }
-
-      if (data.homeCrest) {
-
-        homeCrestElement.textContent =
-          data.homeCrest;
-      }
-
-      if (data.awayCrest) {
-
-        awayCrestElement.textContent =
-          data.awayCrest;
-      }
-
-
-      updateScreen();
-
-      updatingFromFirebase = false;
-
-    });
+    );
 
   })
 
-  .catch((error) => {
+
+  .catch(function(error) {
 
     console.error(error);
+
 
     statusElement.textContent =
       "Error al conectar con Firebase";
@@ -934,16 +1086,40 @@ signInAnonymously(auth)
 
 updateScreen();
 
-window.homeGoal = homeGoal;
-window.awayGoal = awayGoal;
-window.startClock = startClock;
-window.pauseClock = pauseClock;
-window.finishFirstHalf = finishFirstHalf;
-window.startSecondHalf = startSecondHalf;
-window.finishMatch = finishMatch;
-window.showAddedTime = showAddedTime;
-window.hideAddedTime = hideAddedTime;
-window.resetMatch = resetMatch;
+
+/* =========================
+   BOTONES HTML
+========================= */
+
+window.homeGoal =
+  homeGoal;
+
+window.awayGoal =
+  awayGoal;
+
+window.startClock =
+  startClock;
+
+window.pauseClock =
+  pauseClock;
+
+window.finishFirstHalf =
+  finishFirstHalf;
+
+window.startSecondHalf =
+  startSecondHalf;
+
+window.finishMatch =
+  finishMatch;
+
+window.showAddedTime =
+  showAddedTime;
+
+window.hideAddedTime =
+  hideAddedTime;
+
+window.resetMatch =
+  resetMatch;
 
 </script>
 
