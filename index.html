@@ -119,6 +119,25 @@ body {
   letter-spacing: 1px;
 }
 
+  .first-leg {
+  display: none;
+  text-align: center;
+  margin-top: 5px;
+}
+
+.first-leg-title {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #aaa;
+}
+
+.first-leg-score {
+  font-size: 14px;
+  font-weight: 900;
+  margin-top: 2px;
+}
+
 .halftime {
   display: none;
   font-size: 22px;
@@ -358,6 +377,10 @@ let away = 0;
 let homeFouls = 0;
 let awayFouls = 0;
 
+  let firstLegHomeScore = 0;
+let firstLegAwayScore = 0;
+let showFirstLeg = false;
+
 let seconds = 0;
 
 let gameMode = "futbol";
@@ -396,6 +419,12 @@ const clockElement =
 
 const periodElement =
   document.getElementById("period");
+
+  const firstLegElement =
+  document.getElementById("firstLeg");
+
+const firstLegScoreElement =
+  document.getElementById("firstLegScore");
 
 const halftimeElement =
   document.getElementById("halftime");
@@ -505,6 +534,20 @@ function updateScreen() {
 
   awayScoreElement.textContent =
     away;
+
+  firstLegScoreElement.textContent =
+  firstLegHomeScore + " - " + firstLegAwayScore;
+
+if (showFirstLeg) {
+
+  firstLegElement.style.display =
+    "block";
+
+} else {
+
+  firstLegElement.style.display =
+    "none";
+}
 
   homeFoulsElement.textContent =
     "FALTAS: " + homeFouls;
@@ -1162,6 +1205,15 @@ auth.signInAnonymously()
 
         awayFouls =
           data.awayFouls ?? 0;
+
+        firstLegHomeScore =
+  data.firstLegHomeScore ?? 0;
+
+firstLegAwayScore =
+  data.firstLegAwayScore ?? 0;
+
+showFirstLeg =
+  data.showFirstLeg ?? false;
 
         seconds =
           data.seconds ?? 0;
