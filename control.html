@@ -115,6 +115,13 @@ button:active {
   background: #492020;
 }
 
+.faltas-numero {
+  font-size: 30px;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
 </style>
 </head>
 
@@ -192,6 +199,70 @@ button:active {
       <button onclick="awayGoal()">
         + VISITANTE
       </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- FALTAS -->
+
+  <div class="seccion">
+
+    <div class="seccion-titulo">
+      Faltas
+    </div>
+
+    <div class="marcador">
+
+      <div class="equipo">
+
+        <div class="equipo-nombre">
+          LOCAL
+        </div>
+
+        <div id="homeFouls" class="faltas-numero">
+          0
+        </div>
+
+        <div class="fila">
+
+          <button onclick="homeFoulDown()">
+            −1
+          </button>
+
+          <button onclick="homeFoulUp()">
+            +1
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="equipo">
+
+        <div class="equipo-nombre">
+          VISITANTE
+        </div>
+
+        <div id="awayFouls" class="faltas-numero">
+          0
+        </div>
+
+        <div class="fila">
+
+          <button onclick="awayFoulDown()">
+            −1
+          </button>
+
+          <button onclick="awayFoulUp()">
+            +1
+          </button>
+
+        </div>
+
+      </div>
 
     </div>
 
@@ -341,6 +412,10 @@ const matchRef =
 
 let home = 0;
 let away = 0;
+
+let homeFouls = 0;
+let awayFouls = 0;
+
 let seconds = 0;
 let gameMode = "futbol";
 
@@ -358,6 +433,12 @@ const homeScoreElement =
 
 const awayScoreElement =
   document.getElementById("awayScore");
+
+const homeFoulsElement =
+  document.getElementById("homeFouls");
+
+const awayFoulsElement =
+  document.getElementById("awayFouls");
 
 const homeNameElement =
   document.getElementById("homeName");
@@ -394,11 +475,6 @@ function setMode(mode) {
   gameMode = mode;
 
 
-  /*
-    Si cambiamos a Futsal y el reloj está
-    en cero, dejamos preparado el 1T en 20:00.
-  */
-
   if (
     mode === "futsal" &&
     !running &&
@@ -410,12 +486,6 @@ function setMode(mode) {
       20 * 60;
   }
 
-
-  /*
-    Si cambiamos a Fútbol y todavía estamos
-    en 20:00 preparado para Futsal, volvemos
-    a 00:00 como estaba originalmente.
-  */
 
   if (
     mode === "futbol" &&
@@ -467,10 +537,6 @@ function getCurrentSeconds() {
     );
 
 
-  /*
-    Futsal cuenta hacia atrás.
-  */
-
   if (gameMode === "futsal") {
 
     return Math.max(
@@ -479,11 +545,6 @@ function getCurrentSeconds() {
     );
   }
 
-
-  /*
-    Fútbol mantiene el comportamiento
-    original: cuenta hacia arriba.
-  */
 
   return seconds + Math.max(0, elapsed);
 }
@@ -494,11 +555,6 @@ function updateClock() {
   const currentSeconds =
     getCurrentSeconds();
 
-
-  /*
-    Si es Futsal y llegó a cero,
-    detenemos automáticamente el reloj.
-  */
 
   if (
     gameMode === "futsal" &&
@@ -595,6 +651,12 @@ function updateScreen() {
   awayScoreElement.textContent =
     away;
 
+  homeFoulsElement.textContent =
+    homeFouls;
+
+  awayFoulsElement.textContent =
+    awayFouls;
+
   updateClock();
 
   periodElement.textContent =
@@ -669,6 +731,74 @@ function awayGoal() {
 
 
 /* =========================
+   FALTAS
+========================= */
+
+function homeFoulUp() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+  matchRef
+    .child("homeFouls")
+    .transaction(function(currentValue) {
+
+      return (currentValue || 0) + 1;
+
+    });
+}
+
+
+function homeFoulDown() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+  matchRef
+    .child("homeFouls")
+    .transaction(function(currentValue) {
+
+      return Math.max(0, (currentValue || 0) - 1);
+
+    });
+}
+
+
+function awayFoulUp() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+  matchRef
+    .child("awayFouls")
+    .transaction(function(currentValue) {
+
+      return (currentValue || 0) + 1;
+
+    });
+}
+
+
+function awayFoulDown() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+  matchRef
+    .child("awayFouls")
+    .transaction(function(currentValue) {
+
+      return Math.max(0, (currentValue || 0) - 1);
+
+    });
+}
+
+
+/* =========================
    RELOJ
 ========================= */
 
@@ -690,11 +820,6 @@ function startClock() {
   }
 
 
-  /*
-    En Futsal, si estamos en 00:00
-    y es el 1T, preparamos 20:00.
-  */
-
   if (
     gameMode === "futsal" &&
     currentPeriod === "1T" &&
@@ -705,11 +830,6 @@ function startClock() {
       20 * 60;
   }
 
-
-  /*
-    Si Futsal está en 00:00 durante el 2T,
-    no permitimos iniciar nuevamente.
-  */
 
   if (
     gameMode === "futsal" &&
@@ -848,14 +968,6 @@ function startSecondHalf() {
   stopLocalTimer();
 
 
-  /*
-    Futsal: segundo tiempo comienza
-    nuevamente en 20:00.
-
-    Fútbol: segundo tiempo continúa
-    comenzando en 45:00.
-  */
-
   if (gameMode === "futsal") {
 
     seconds =
@@ -873,6 +985,17 @@ function startSecondHalf() {
 
   addedTime =
     null;
+
+  /*
+    Las faltas se reinician
+    al comenzar el segundo tiempo.
+  */
+
+  homeFouls =
+    0;
+
+  awayFouls =
+    0;
 
   running =
     true;
@@ -896,6 +1019,12 @@ function startSecondHalf() {
 
     addedTime:
       null,
+
+    homeFouls:
+      0,
+
+    awayFouls:
+      0,
 
     running:
       true,
@@ -1017,13 +1146,9 @@ function resetMatch() {
   home = 0;
   away = 0;
 
+  homeFouls = 0;
+  awayFouls = 0;
 
-  /*
-    Al reiniciar Futsal queda preparado
-    en 20:00.
-
-    Fútbol queda en 00:00 como antes.
-  */
 
   if (gameMode === "futsal") {
 
@@ -1058,6 +1183,12 @@ function resetMatch() {
       0,
 
     awayScore:
+      0,
+
+    homeFouls:
+      0,
+
+    awayFouls:
       0,
 
     seconds:
@@ -1118,6 +1249,12 @@ auth.signInAnonymously()
 
         away =
           data.awayScore ?? 0;
+
+        homeFouls =
+          data.homeFouls ?? 0;
+
+        awayFouls =
+          data.awayFouls ?? 0;
 
         seconds =
           data.seconds ?? 0;
@@ -1205,6 +1342,18 @@ window.homeGoal =
 
 window.awayGoal =
   awayGoal;
+
+window.homeFoulUp =
+  homeFoulUp;
+
+window.homeFoulDown =
+  homeFoulDown;
+
+window.awayFoulUp =
+  awayFoulUp;
+
+window.awayFoulDown =
+  awayFoulDown;
 
 window.startClock =
   startClock;
