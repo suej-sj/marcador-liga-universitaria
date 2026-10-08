@@ -1942,12 +1942,14 @@ auth.signInAnonymously()
 
   })
 
-  .catch(function(error) {
+.catch(function(error) {
 
-    console.error(error);
+  console.error("ERROR FIREBASE:", error);
 
-    estadoElement.textContent =
-      "Error al conectar con Firebase";
+  estadoElement.textContent =
+    "Firebase: " + error.code;
+
+});
 
   });
 
