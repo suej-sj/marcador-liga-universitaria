@@ -450,6 +450,10 @@ let awayFouls = 0;
 let firstLegAwayScore = 0;
 let showFirstLeg = false;
 
+  let penaltyHomeResults = [];
+let penaltyAwayResults = [];
+let showPenalties = false;
+
 let seconds = 0;
 
 let gameMode = "futbol";
@@ -494,6 +498,21 @@ const periodElement =
 
 const firstLegScoreElement =
   document.getElementById("firstLegScore");
+
+  const penaltiesElement =
+  document.getElementById("penalties");
+
+const penaltyHomeScoreElement =
+  document.getElementById("penaltyHomeScore");
+
+const penaltyAwayScoreElement =
+  document.getElementById("penaltyAwayScore");
+
+const penaltyHomeResultsElement =
+  document.getElementById("penaltyHomeResults");
+
+const penaltyAwayResultsElement =
+  document.getElementById("penaltyAwayResults");
 
 const halftimeElement =
   document.getElementById("halftime");
@@ -596,7 +615,23 @@ function updateClock() {
    PANTALLA
 ========================= */
 
-function updateScreen() {
+function countPenaltyGoals(results) {
+  return results.filter(function(result) {
+    return result === "goal";
+  }).length;
+}
+
+function penaltySymbol(result) {
+  return result === "goal" ? "●" : "X";
+}
+
+function resultsToText(results) {
+  if (!results || results.length === 0) return "—";
+
+  return results.map(penaltySymbol).join(" ");
+}
+  
+  function updateScreen() {
 
   homeScoreElement.textContent =
     home;
@@ -616,6 +651,24 @@ if (showFirstLeg) {
 
   firstLegElement.style.display =
     "none";
+}
+
+  penaltyHomeScoreElement.textContent =
+  countPenaltyGoals(penaltyHomeResults);
+
+penaltyAwayScoreElement.textContent =
+  countPenaltyGoals(penaltyAwayResults);
+
+penaltyHomeResultsElement.textContent =
+  resultsToText(penaltyHomeResults);
+
+penaltyAwayResultsElement.textContent =
+  resultsToText(penaltyAwayResults);
+
+if (showPenalties) {
+  penaltiesElement.style.display = "grid";
+} else {
+  penaltiesElement.style.display = "none";
 }
 
   homeFoulsElement.textContent =
@@ -1283,6 +1336,19 @@ firstLegAwayScore =
 
 showFirstLeg =
   data.showFirstLeg ?? false;
+
+        penaltyHomeResults =
+  Array.isArray(data.penaltyHomeResults)
+    ? data.penaltyHomeResults
+    : [];
+
+penaltyAwayResults =
+  Array.isArray(data.penaltyAwayResults)
+    ? data.penaltyAwayResults
+    : [];
+
+showPenalties =
+  data.showPenalties ?? false;
 
         seconds =
           data.seconds ?? 0;
