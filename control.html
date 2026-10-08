@@ -1820,10 +1820,12 @@ function resetMatch() {
    FIREBASE
 ========================= */
 console.log("Firebase cargado correctamente");
-  
+
 auth.signInAnonymously()
 
   .then(function() {
+
+    console.log("AUTENTICACIÓN FIREBASE OK");
 
     partidoElement.textContent =
       "Partido " + partidoNumero;
