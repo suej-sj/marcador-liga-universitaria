@@ -138,6 +138,58 @@ body {
   margin-top: 2px;
 }
 
+  .penalties {
+  display: none;
+  width: 100%;
+  min-height: 48px;
+  padding: 7px 20px;
+  background: #111;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 15px;
+}
+
+.penalty-team {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-penalty {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.away-penalty {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.penalty-score {
+  font-size: 20px;
+  font-weight: 900;
+  min-width: 22px;
+}
+
+.penalty-results {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.penalty-center {
+  text-align: center;
+}
+
+.penalty-title {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+
 .halftime {
   display: none;
   font-size: 22px;
@@ -298,11 +350,28 @@ button:active {
 
     </div>
 
+    </div>
+
+  <div id="penalties" class="penalties">
+
+    <div class="penalty-team home-penalty">
+      <div id="penaltyHomeScore" class="penalty-score">0</div>
+      <div id="penaltyHomeResults" class="penalty-results">—</div>
+    </div>
+
+    <div class="penalty-center">
+      <div class="penalty-title">PENALES</div>
+    </div>
+
+    <div class="penalty-team away-penalty">
+      <div id="penaltyAwayScore" class="penalty-score">0</div>
+      <div id="penaltyAwayResults" class="penalty-results">—</div>
+    </div>
+
   </div>
 
 
   <div class="controls">
-
     <button onclick="homeGoal()">+ Local</button>
     <button onclick="awayGoal()">+ Visitante</button>
 
