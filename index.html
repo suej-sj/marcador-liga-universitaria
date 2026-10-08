@@ -86,6 +86,15 @@ body {
   text-align: center;
 }
 
+.fouls {
+  display: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: #aaa;
+  margin-top: 6px;
+  white-space: nowrap;
+}
+
 .center {
   text-align: center;
   position: relative;
@@ -167,6 +176,7 @@ button:active {
 }
 
 @media (max-width: 800px) {
+
   .match {
     grid-template-columns: 1fr 130px 1fr;
     padding: 15px 10px;
@@ -187,6 +197,10 @@ button:active {
   .score {
     font-size: 42px;
     min-width: 40px;
+  }
+
+  .fouls {
+    font-size: 11px;
   }
 
   .clock {
@@ -213,10 +227,21 @@ button:active {
   <div class="match">
 
     <div class="team home">
-      <div id="homeName">EQUIPO LOCAL</div>
+
+      <div>
+        <div id="homeName">EQUIPO LOCAL</div>
+
+        <div id="homeFouls" class="fouls">
+          FALTAS: 0
+        </div>
+      </div>
+
       <div id="homeCrest" class="crest">A</div>
+
       <div id="homeScore" class="score">0</div>
+
     </div>
+
 
     <div class="center">
 
@@ -224,21 +249,33 @@ button:active {
 
       <div id="period" class="period">1T</div>
 
-      <div id="halftime" class="halftime">ENTRETIEMPO</div>
+      <div id="halftime" class="halftime">
+        ENTRETIEMPO
+      </div>
 
       <div id="addedTime" class="added-time"></div>
 
     </div>
 
+
     <div class="team away">
 
       <div id="awayScore" class="score">0</div>
+
       <div id="awayCrest" class="crest">B</div>
-      <div id="awayName">EQUIPO VISITANTE</div>
+
+      <div>
+        <div id="awayName">EQUIPO VISITANTE</div>
+
+        <div id="awayFouls" class="fouls">
+          FALTAS: 0
+        </div>
+      </div>
 
     </div>
 
   </div>
+
 
   <div class="controls">
 
@@ -263,6 +300,7 @@ button:active {
     <button onclick="resetMatch()">↺ Reiniciar</button>
 
   </div>
+
 
   <div id="status" class="status">
     Conectando con Firebase...
@@ -295,7 +333,8 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-const params = new URLSearchParams(window.location.search);
+const params =
+  new URLSearchParams(window.location.search);
 
 const partidoNumero =
   params.get("partido") || "1";
@@ -310,6 +349,9 @@ const matchRef =
 
 let home = 0;
 let away = 0;
+
+let homeFouls = 0;
+let awayFouls = 0;
 
 let seconds = 0;
 
@@ -337,6 +379,12 @@ const homeScoreElement =
 
 const awayScoreElement =
   document.getElementById("awayScore");
+
+const homeFoulsElement =
+  document.getElementById("homeFouls");
+
+const awayFoulsElement =
+  document.getElementById("awayFouls");
 
 const clockElement =
   document.getElementById("clock");
@@ -386,14 +434,6 @@ function getCurrentSeconds() {
     );
 
 
-  /*
-    Futsal:
-    cuenta hacia atrás.
-
-    Fútbol:
-    cuenta hacia arriba.
-  */
-
   if (gameMode === "futsal") {
 
     return Math.max(
@@ -413,11 +453,6 @@ function updateClock() {
   const currentSeconds =
     getCurrentSeconds();
 
-
-  /*
-    Si Futsal llegó a 00:00,
-    detenemos el reloj localmente.
-  */
 
   if (
     gameMode === "futsal" &&
@@ -465,6 +500,35 @@ function updateScreen() {
 
   awayScoreElement.textContent =
     away;
+
+  homeFoulsElement.textContent =
+    "FALTAS: " + homeFouls;
+
+  awayFoulsElement.textContent =
+    "FALTAS: " + awayFouls;
+
+  /*
+    Las faltas solamente se muestran
+    cuando la modalidad es Futsal.
+  */
+
+  if (gameMode === "futsal") {
+
+    homeFoulsElement.style.display =
+      "block";
+
+    awayFoulsElement.style.display =
+      "block";
+
+  } else {
+
+    homeFoulsElement.style.display =
+      "none";
+
+    awayFoulsElement.style.display =
+      "none";
+  }
+
 
   updateClock();
 
@@ -549,11 +613,12 @@ function startLocalTimer() {
     return;
   }
 
-  timer = setInterval(function() {
+  timer =
+    setInterval(function() {
 
-    updateClock();
+      updateClock();
 
-  }, 250);
+    }, 250);
 }
 
 
@@ -585,6 +650,12 @@ function saveState(extraData) {
 
     awayScore:
       away,
+
+    homeFouls:
+      homeFouls,
+
+    awayFouls:
+      awayFouls,
 
     seconds:
       seconds,
@@ -816,11 +887,6 @@ function startSecondHalf() {
   stopLocalTimer();
 
 
-  /*
-    Futsal: 20:00.
-    Fútbol: 45:00.
-  */
-
   if (gameMode === "futsal") {
 
     seconds =
@@ -993,6 +1059,10 @@ function resetMatch() {
 
   away = 0;
 
+  homeFouls = 0;
+
+  awayFouls = 0;
+
   seconds = 0;
 
   running = false;
@@ -1013,6 +1083,12 @@ function resetMatch() {
       0,
 
     awayScore:
+      0,
+
+    homeFouls:
+      0,
+
+    awayFouls:
       0,
 
     seconds:
@@ -1075,6 +1151,12 @@ auth.signInAnonymously()
 
         away =
           data.awayScore ?? 0;
+
+        homeFouls =
+          data.homeFouls ?? 0;
+
+        awayFouls =
+          data.awayFouls ?? 0;
 
         seconds =
           data.seconds ?? 0;
