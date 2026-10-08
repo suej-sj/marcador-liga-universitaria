@@ -119,23 +119,26 @@ body {
   letter-spacing: 1px;
 }
 
-  .first-leg {
+.first-leg {
   display: none;
-  text-align: center;
-  margin-top: 5px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 4px;
+  line-height: 1;
 }
 
 .first-leg-title {
   font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 1px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
   color: #aaa;
 }
 
 .first-leg-score {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 900;
-  margin-top: 2px;
+  margin-top: 0;
 }
 
   .penalties {
@@ -321,9 +324,9 @@ button:active {
       <div id="period" class="period">1T</div>
 
       <div id="firstLeg" class="first-leg">
-  <div class="first-leg-title">IDA</div>
-  <div id="firstLegScore" class="first-leg-score">0 - 0</div>
-      </div>
+  <span class="first-leg-title">IDA:</span>
+  <span id="firstLegScore" class="first-leg-score">0 - 0</span>
+</div>
 
       <div id="halftime" class="halftime">
         ENTRETIEMPO
@@ -650,7 +653,7 @@ function resultsToText(results) {
 if (showFirstLeg) {
 
   firstLegElement.style.display =
-    "block";
+    "flex";
 
 } else {
 
