@@ -122,6 +122,29 @@ button:active {
   margin-bottom: 8px;
 }
 
+.penales-numero {
+  font-size: 28px;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.penales-registro {
+  text-align: center;
+  color: #aaa;
+  font-size: 14px;
+  min-height: 20px;
+  margin-bottom: 10px;
+  word-break: break-all;
+}
+
+.subtitulo-control {
+  text-align: center;
+  color: #aaa;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
 </style>
 </head>
 
@@ -166,6 +189,8 @@ button:active {
 
   </div>
 
+
+  <!-- MARCADOR -->
 
   <div class="marcador">
 
@@ -285,6 +310,164 @@ button:active {
   </div>
 
 
+  <!-- RESULTADO DE IDA -->
+
+  <div class="seccion">
+
+    <div class="seccion-titulo">
+      Resultado de ida
+    </div>
+
+    <div class="marcador">
+
+      <div class="equipo">
+
+        <div class="equipo-nombre">
+          LOCAL
+        </div>
+
+        <div id="firstLegHomeScore" class="goles">
+          0
+        </div>
+
+        <div class="fila">
+
+          <button onclick="firstLegHomeUp()">
+            +1
+          </button>
+
+          <button onclick="firstLegHomeDown()">
+            −1
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="equipo">
+
+        <div class="equipo-nombre">
+          VISITANTE
+        </div>
+
+        <div id="firstLegAwayScore" class="goles">
+          0
+        </div>
+
+        <div class="fila">
+
+          <button onclick="firstLegAwayUp()">
+            +1
+          </button>
+
+          <button onclick="firstLegAwayDown()">
+            −1
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <button onclick="toggleFirstLeg()">
+      Mostrar / Ocultar ida
+    </button>
+
+    <div id="firstLegDisplay" style="text-align:center; color:#aaa;">
+      Oculto
+    </div>
+
+  </div>
+
+
+  <!-- TANDA DE PENALES -->
+
+  <div class="seccion">
+
+    <div class="seccion-titulo">
+      Tanda de penales
+    </div>
+
+    <button onclick="togglePenalties()">
+      Mostrar / Ocultar penales
+    </button>
+
+    <div class="marcador">
+
+      <div class="equipo">
+
+        <div class="equipo-nombre">
+          LOCAL
+        </div>
+
+        <div id="penaltyHomeScore" class="penales-numero">
+          0
+        </div>
+
+        <div class="subtitulo-control">
+          Convertidos
+        </div>
+
+        <button onclick="penaltyHomeGoal()">
+          GOL
+        </button>
+
+        <button onclick="penaltyHomeMiss()">
+          ERRADO
+        </button>
+
+        <button onclick="penaltyHomeCorrect()">
+          CORREGIR ÚLTIMO
+        </button>
+
+        <div id="penaltyHomeResults" class="penales-registro">
+          —
+        </div>
+
+      </div>
+
+
+      <div class="equipo">
+
+        <div class="equipo-nombre">
+          VISITANTE
+        </div>
+
+        <div id="penaltyAwayScore" class="penales-numero">
+          0
+        </div>
+
+        <div class="subtitulo-control">
+          Convertidos
+        </div>
+
+        <button onclick="penaltyAwayGoal()">
+          GOL
+        </button>
+
+        <button onclick="penaltyAwayMiss()">
+          ERRADO
+        </button>
+
+        <button onclick="penaltyAwayCorrect()">
+          CORREGIR ÚLTIMO
+        </button>
+
+        <div id="penaltyAwayResults" class="penales-registro">
+          —
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- RELOJ -->
+
   <div class="seccion">
 
     <div class="seccion-titulo">
@@ -314,6 +497,8 @@ button:active {
   </div>
 
 
+  <!-- TIEMPO DE JUEGO -->
+
   <div class="seccion">
 
     <div class="seccion-titulo">
@@ -338,6 +523,8 @@ button:active {
 
   </div>
 
+
+  <!-- TIEMPO ADICIONAL -->
 
   <div class="seccion">
 
@@ -376,6 +563,8 @@ button:active {
   </div>
 
 
+  <!-- PARTIDO -->
+
   <div class="seccion">
 
     <div class="seccion-titulo">
@@ -401,7 +590,7 @@ button:active {
 <script>
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBZO-xr8s1iXC6RrSYYX3VSaqEs_1Vnj80",
+  apiKey: "AIzaSyBZO-xr8s1iXC6RrSYYX3VSaqEs1Vnj80",
   authDomain: "suenos-en-juego-marcador.firebaseapp.com",
   projectId: "suenos-en-juego-marcador",
   storageBucket: "suenos-en-juego-marcador.firebasestorage.app",
@@ -431,6 +620,14 @@ let away = 0;
 
 let homeFouls = 0;
 let awayFouls = 0;
+
+let firstLegHomeScore = 0;
+let firstLegAwayScore = 0;
+let showFirstLeg = false;
+
+let penaltyHomeResults = [];
+let penaltyAwayResults = [];
+let showPenalties = false;
 
 let seconds = 0;
 let gameMode = "futbol";
@@ -476,6 +673,27 @@ const partidoElement =
 
 const modeDisplay =
   document.getElementById("modeDisplay");
+
+const firstLegHomeScoreElement =
+  document.getElementById("firstLegHomeScore");
+
+const firstLegAwayScoreElement =
+  document.getElementById("firstLegAwayScore");
+
+const firstLegDisplayElement =
+  document.getElementById("firstLegDisplay");
+
+const penaltyHomeScoreElement =
+  document.getElementById("penaltyHomeScore");
+
+const penaltyAwayScoreElement =
+  document.getElementById("penaltyAwayScore");
+
+const penaltyHomeResultsElement =
+  document.getElementById("penaltyHomeResults");
+
+const penaltyAwayResultsElement =
+  document.getElementById("penaltyAwayResults");
 
 
 /* =========================
@@ -659,6 +877,34 @@ function startLocalTimer() {
    MOSTRAR DATOS
 ========================= */
 
+function countPenaltyGoals(results) {
+
+  return results.filter(function(result) {
+    return result === "goal";
+  }).length;
+}
+
+
+function penaltySymbol(result) {
+
+  return result === "goal"
+    ? "●"
+    : "X";
+}
+
+
+function resultsToText(results) {
+
+  if (!results || results.length === 0) {
+    return "—";
+  }
+
+  return results
+    .map(penaltySymbol)
+    .join(" ");
+}
+
+
 function updateScreen() {
 
   homeScoreElement.textContent =
@@ -672,6 +918,48 @@ function updateScreen() {
 
   awayFoulsElement.textContent =
     awayFouls;
+
+
+  firstLegHomeScoreElement.textContent =
+    firstLegHomeScore;
+
+  firstLegAwayScoreElement.textContent =
+    firstLegAwayScore;
+
+
+  penaltyHomeScoreElement.textContent =
+    countPenaltyGoals(
+      penaltyHomeResults
+    );
+
+  penaltyAwayScoreElement.textContent =
+    countPenaltyGoals(
+      penaltyAwayResults
+    );
+
+
+  penaltyHomeResultsElement.textContent =
+    resultsToText(
+      penaltyHomeResults
+    );
+
+  penaltyAwayResultsElement.textContent =
+    resultsToText(
+      penaltyAwayResults
+    );
+
+
+  if (showFirstLeg) {
+
+    firstLegDisplayElement.textContent =
+      "MOSTRANDO";
+
+  } else {
+
+    firstLegDisplayElement.textContent =
+      "Oculto";
+  }
+
 
   updateClock();
 
@@ -756,7 +1044,10 @@ function homeGoalDown() {
     .child("homeScore")
     .transaction(function(currentValue) {
 
-      return Math.max(0, (currentValue || 0) - 1);
+      return Math.max(
+        0,
+        (currentValue || 0) - 1
+      );
 
     });
 }
@@ -772,7 +1063,10 @@ function awayGoalDown() {
     .child("awayScore")
     .transaction(function(currentValue) {
 
-      return Math.max(0, (currentValue || 0) - 1);
+      return Math.max(
+        0,
+        (currentValue || 0) - 1
+      );
 
     });
 }
@@ -808,7 +1102,10 @@ function homeFoulDown() {
     .child("homeFouls")
     .transaction(function(currentValue) {
 
-      return Math.max(0, (currentValue || 0) - 1);
+      return Math.max(
+        0,
+        (currentValue || 0) - 1
+      );
 
     });
 }
@@ -840,9 +1137,245 @@ function awayFoulDown() {
     .child("awayFouls")
     .transaction(function(currentValue) {
 
-      return Math.max(0, (currentValue || 0) - 1);
+      return Math.max(
+        0,
+        (currentValue || 0) - 1
+      );
 
     });
+}
+
+
+/* =========================
+   RESULTADO DE IDA
+========================= */
+
+function firstLegHomeUp() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+  matchRef
+    .child("firstLegHomeScore")
+    .transaction(function(currentValue) {
+
+      return (currentValue || 0) + 1;
+
+    });
+}
+
+
+function firstLegHomeDown() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+  matchRef
+    .child("firstLegHomeScore")
+    .transaction(function(currentValue) {
+
+      return Math.max(
+        0,
+        (currentValue || 0) - 1
+      );
+
+    });
+}
+
+
+function firstLegAwayUp() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+  matchRef
+    .child("firstLegAwayScore")
+    .transaction(function(currentValue) {
+
+      return (currentValue || 0) + 1;
+
+    });
+}
+
+
+function firstLegAwayDown() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+  matchRef
+    .child("firstLegAwayScore")
+    .transaction(function(currentValue) {
+
+      return Math.max(
+        0,
+        (currentValue || 0) - 1
+      );
+
+    });
+}
+
+
+function toggleFirstLeg() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+  showFirstLeg =
+    !showFirstLeg;
+
+
+  matchRef.update({
+
+    showFirstLeg:
+      showFirstLeg
+
+  });
+}
+
+
+/* =========================
+   TANDA DE PENALES
+========================= */
+
+function togglePenalties() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+  showPenalties =
+    !showPenalties;
+    matchRef.update({
+
+    showPenalties:
+      showPenalties
+
+  });
+}
+
+
+function addPenaltyResult(
+  team,
+  result
+) {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+
+  const path =
+    team === "home"
+      ? "penaltyHomeResults"
+      : "penaltyAwayResults";
+
+
+  matchRef
+    .child(path)
+    .transaction(function(currentValue) {
+
+      const results =
+        Array.isArray(currentValue)
+          ? currentValue.slice()
+          : [];
+
+      results.push(result);
+
+      return results;
+
+    });
+}
+
+
+function correctPenalty(team) {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+
+  const path =
+    team === "home"
+      ? "penaltyHomeResults"
+      : "penaltyAwayResults";
+
+
+  matchRef
+    .child(path)
+    .transaction(function(currentValue) {
+
+      const results =
+        Array.isArray(currentValue)
+          ? currentValue.slice()
+          : [];
+
+      if (results.length === 0) {
+        return results;
+      }
+
+      results.pop();
+
+      return results;
+
+    });
+}
+
+
+function penaltyHomeGoal() {
+
+  addPenaltyResult(
+    "home",
+    "goal"
+  );
+}
+
+
+function penaltyHomeMiss() {
+
+  addPenaltyResult(
+    "home",
+    "miss"
+  );
+}
+
+
+function penaltyHomeCorrect() {
+
+  correctPenalty(
+    "home"
+  );
+}
+
+
+function penaltyAwayGoal() {
+
+  addPenaltyResult(
+    "away",
+    "goal"
+  );
+}
+
+
+function penaltyAwayMiss() {
+
+  addPenaltyResult(
+    "away",
+    "miss"
+  );
+}
+
+
+function penaltyAwayCorrect() {
+
+  correctPenalty(
+    "away"
+  );
 }
 
 
@@ -1193,6 +1726,14 @@ function resetMatch() {
   homeFouls = 0;
   awayFouls = 0;
 
+  firstLegHomeScore = 0;
+  firstLegAwayScore = 0;
+  showFirstLeg = false;
+
+  penaltyHomeResults = [];
+  penaltyAwayResults = [];
+  showPenalties = false;
+
 
   if (gameMode === "futsal") {
 
@@ -1234,6 +1775,24 @@ function resetMatch() {
 
     awayFouls:
       0,
+
+    firstLegHomeScore:
+      0,
+
+    firstLegAwayScore:
+      0,
+
+    showFirstLeg:
+      false,
+
+    penaltyHomeResults:
+      [],
+
+    penaltyAwayResults:
+      [],
+
+    showPenalties:
+      false,
 
     seconds:
       seconds,
@@ -1299,6 +1858,28 @@ auth.signInAnonymously()
 
         awayFouls =
           data.awayFouls ?? 0;
+
+        firstLegHomeScore =
+          data.firstLegHomeScore ?? 0;
+
+        firstLegAwayScore =
+          data.firstLegAwayScore ?? 0;
+
+        showFirstLeg =
+          data.showFirstLeg ?? false;
+
+        penaltyHomeResults =
+          Array.isArray(data.penaltyHomeResults)
+            ? data.penaltyHomeResults
+            : [];
+
+        penaltyAwayResults =
+          Array.isArray(data.penaltyAwayResults)
+            ? data.penaltyAwayResults
+            : [];
+
+        showPenalties =
+          data.showPenalties ?? false;
 
         seconds =
           data.seconds ?? 0;
@@ -1404,6 +1985,42 @@ window.awayFoulUp =
 
 window.awayFoulDown =
   awayFoulDown;
+
+window.firstLegHomeUp =
+  firstLegHomeUp;
+
+window.firstLegHomeDown =
+  firstLegHomeDown;
+
+window.firstLegAwayUp =
+  firstLegAwayUp;
+
+window.firstLegAwayDown =
+  firstLegAwayDown;
+
+window.toggleFirstLeg =
+  toggleFirstLeg;
+
+window.togglePenalties =
+  togglePenalties;
+
+window.penaltyHomeGoal =
+  penaltyHomeGoal;
+
+window.penaltyHomeMiss =
+  penaltyHomeMiss;
+
+window.penaltyHomeCorrect =
+  penaltyHomeCorrect;
+
+window.penaltyAwayGoal =
+  penaltyAwayGoal;
+
+window.penaltyAwayMiss =
+  penaltyAwayMiss;
+
+window.penaltyAwayCorrect =
+  penaltyAwayCorrect;
 
 window.startClock =
   startClock;
