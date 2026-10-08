@@ -633,6 +633,11 @@ function resultsToText(results) {
   
   function updateScreen() {
 
+    leagueElement.textContent =
+  gameMode === "futsal"
+    ? "SUEÑOS EN JUEGO"
+    : "LIGA UNIVERSITARIA";
+
   homeScoreElement.textContent =
     home;
 
