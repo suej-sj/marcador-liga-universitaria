@@ -393,15 +393,58 @@ function setMode(mode) {
 
   gameMode = mode;
 
+
+  /*
+    Si cambiamos a Futsal y el reloj está
+    en cero, dejamos preparado el 1T en 20:00.
+  */
+
+  if (
+    mode === "futsal" &&
+    !running &&
+    currentPeriod === "1T" &&
+    seconds <= 0
+  ) {
+
+    seconds =
+      20 * 60;
+  }
+
+
+  /*
+    Si cambiamos a Fútbol y todavía estamos
+    en 20:00 preparado para Futsal, volvemos
+    a 00:00 como estaba originalmente.
+  */
+
+  if (
+    mode === "futbol" &&
+    !running &&
+    currentPeriod === "1T" &&
+    seconds === 20 * 60
+  ) {
+
+    seconds =
+      0;
+  }
+
+
   modeDisplay.textContent =
     mode === "futsal"
       ? "Futsal"
       : "Fútbol";
 
+
+  updateScreen();
+
+
   matchRef.update({
 
     gameMode:
-      mode
+      mode,
+
+    seconds:
+      seconds
 
   });
 }
@@ -417,10 +460,30 @@ function getCurrentSeconds() {
     return seconds;
   }
 
+
   const elapsed =
     Math.floor(
       (Date.now() - clockStartedAt) / 1000
     );
+
+
+  /*
+    Futsal cuenta hacia atrás.
+  */
+
+  if (gameMode === "futsal") {
+
+    return Math.max(
+      0,
+      seconds - Math.max(0, elapsed)
+    );
+  }
+
+
+  /*
+    Fútbol mantiene el comportamiento
+    original: cuenta hacia arriba.
+  */
 
   return seconds + Math.max(0, elapsed);
 }
@@ -431,11 +494,59 @@ function updateClock() {
   const currentSeconds =
     getCurrentSeconds();
 
+
+  /*
+    Si es Futsal y llegó a cero,
+    detenemos automáticamente el reloj.
+  */
+
+  if (
+    gameMode === "futsal" &&
+    running &&
+    currentSeconds <= 0
+  ) {
+
+    seconds =
+      0;
+
+    running =
+      false;
+
+    clockStartedAt =
+      null;
+
+    stopLocalTimer();
+
+    clockElement.textContent =
+      "00:00";
+
+    estadoElement.textContent =
+      "TIEMPO AGOTADO";
+
+
+    matchRef.update({
+
+      seconds:
+        0,
+
+      running:
+        false,
+
+      clockStartedAt:
+        null
+
+    });
+
+    return;
+  }
+
+
   const minutes =
     Math.floor(currentSeconds / 60);
 
   const secs =
     currentSeconds % 60;
+
 
   clockElement.textContent =
     String(minutes).padStart(2, "0") +
@@ -489,6 +600,7 @@ function updateScreen() {
   periodElement.textContent =
     currentPeriod;
 
+
   if (currentPeriod === "ENTRETIEMPO") {
 
     estadoElement.textContent =
@@ -503,6 +615,14 @@ function updateScreen() {
 
     estadoElement.textContent =
       "RELOJ EN MARCHA";
+
+  } else if (
+    gameMode === "futsal" &&
+    seconds === 0
+  ) {
+
+    estadoElement.textContent =
+      "TIEMPO AGOTADO";
 
   } else {
 
@@ -566,6 +686,37 @@ function startClock() {
     currentPeriod === "ENTRETIEMPO" ||
     currentPeriod === "FINAL"
   ) {
+    return;
+  }
+
+
+  /*
+    En Futsal, si estamos en 00:00
+    y es el 1T, preparamos 20:00.
+  */
+
+  if (
+    gameMode === "futsal" &&
+    currentPeriod === "1T" &&
+    seconds <= 0
+  ) {
+
+    seconds =
+      20 * 60;
+  }
+
+
+  /*
+    Si Futsal está en 00:00 durante el 2T,
+    no permitimos iniciar nuevamente.
+  */
+
+  if (
+    gameMode === "futsal" &&
+    currentPeriod === "2T" &&
+    seconds <= 0
+  ) {
+
     return;
   }
 
@@ -697,8 +848,25 @@ function startSecondHalf() {
   stopLocalTimer();
 
 
-  seconds =
-    45 * 60;
+  /*
+    Futsal: segundo tiempo comienza
+    nuevamente en 20:00.
+
+    Fútbol: segundo tiempo continúa
+    comenzando en 45:00.
+  */
+
+  if (gameMode === "futsal") {
+
+    seconds =
+      20 * 60;
+
+  } else {
+
+    seconds =
+      45 * 60;
+  }
+
 
   currentPeriod =
     "2T";
@@ -721,7 +889,7 @@ function startSecondHalf() {
   matchRef.update({
 
     seconds:
-      45 * 60,
+      seconds,
 
     period:
       "2T",
@@ -848,7 +1016,26 @@ function resetMatch() {
 
   home = 0;
   away = 0;
-  seconds = 0;
+
+
+  /*
+    Al reiniciar Futsal queda preparado
+    en 20:00.
+
+    Fútbol queda en 00:00 como antes.
+  */
+
+  if (gameMode === "futsal") {
+
+    seconds =
+      20 * 60;
+
+  } else {
+
+    seconds =
+      0;
+  }
+
 
   running = false;
 
@@ -874,7 +1061,7 @@ function resetMatch() {
       0,
 
     seconds:
-      0,
+      seconds,
 
     running:
       false,
@@ -886,7 +1073,10 @@ function resetMatch() {
       null,
 
     clockStartedAt:
-      null
+      null,
+
+    gameMode:
+      gameMode
 
   });
 }
