@@ -161,7 +161,7 @@ button:active {
   background: #0d0d0d;
 }
 
-  .controls,
+.controls,
 .status {
   display: none;
 }
@@ -313,6 +313,8 @@ let away = 0;
 
 let seconds = 0;
 
+let gameMode = "futbol";
+
 let running = false;
 
 let currentPeriod = "1T";
@@ -377,10 +379,30 @@ function getCurrentSeconds() {
     return seconds;
   }
 
+
   const elapsed =
     Math.floor(
       (Date.now() - clockStartedAt) / 1000
     );
+
+
+  /*
+    Futsal:
+    cuenta hacia atrás.
+
+    Fútbol:
+    cuenta hacia arriba.
+  */
+
+  if (gameMode === "futsal") {
+
+    return Math.max(
+      0,
+      seconds - Math.max(0, elapsed)
+    );
+
+  }
+
 
   return seconds + Math.max(0, elapsed);
 }
@@ -391,11 +413,39 @@ function updateClock() {
   const currentSeconds =
     getCurrentSeconds();
 
+
+  /*
+    Si Futsal llegó a 00:00,
+    detenemos el reloj localmente.
+  */
+
+  if (
+    gameMode === "futsal" &&
+    running &&
+    currentSeconds <= 0
+  ) {
+
+    seconds = 0;
+
+    running = false;
+
+    clockStartedAt = null;
+
+    stopLocalTimer();
+
+  }
+
+
+  const displaySeconds =
+    Math.max(0, currentSeconds);
+
+
   const minutes =
-    Math.floor(currentSeconds / 60);
+    Math.floor(displaySeconds / 60);
 
   const secs =
-    currentSeconds % 60;
+    displaySeconds % 60;
+
 
   clockElement.textContent =
     String(minutes).padStart(2, "0") +
@@ -539,6 +589,9 @@ function saveState(extraData) {
     seconds:
       seconds,
 
+    gameMode:
+      gameMode,
+
     running:
       running,
 
@@ -644,6 +697,9 @@ function startClock() {
 
     seconds:
       seconds,
+
+    gameMode:
+      gameMode,
 
     clockStartedAt:
       firebase.database.ServerValue.TIMESTAMP
@@ -760,8 +816,22 @@ function startSecondHalf() {
   stopLocalTimer();
 
 
-  seconds =
-    45 * 60;
+  /*
+    Futsal: 20:00.
+    Fútbol: 45:00.
+  */
+
+  if (gameMode === "futsal") {
+
+    seconds =
+      20 * 60;
+
+  } else {
+
+    seconds =
+      45 * 60;
+  }
+
 
   currentPeriod =
     "2T";
@@ -784,7 +854,10 @@ function startSecondHalf() {
   matchRef.update({
 
     seconds:
-      45 * 60,
+      seconds,
+
+    gameMode:
+      gameMode,
 
     period:
       "2T",
@@ -955,7 +1028,10 @@ function resetMatch() {
       null,
 
     clockStartedAt:
-      null
+      null,
+
+    gameMode:
+      gameMode
 
   });
 }
@@ -1002,6 +1078,9 @@ auth.signInAnonymously()
 
         seconds =
           data.seconds ?? 0;
+
+        gameMode =
+          data.gameMode ?? "futbol";
 
         running =
           data.running ?? false;
