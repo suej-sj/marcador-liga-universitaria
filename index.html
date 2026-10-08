@@ -755,16 +755,17 @@ if (showPenalties) {
   }
 
 
+  if (gameMode === "futsal") {
+  addedTimeElement.style.display = "none";
+} else {
+  addedTimeElement.style.display = "block";
+
   if (addedTime !== null) {
-
-    addedTimeElement.textContent =
-      "+" + addedTime + " adicional";
-
+    addedTimeElement.textContent = "+" + addedTime + " adicional";
   } else {
-
-    addedTimeElement.textContent =
-      "";
+    addedTimeElement.textContent = "";
   }
+}
 }
 
 
