@@ -133,6 +133,33 @@ button:active {
   </div>
 
 
+  <!-- MODALIDAD -->
+
+  <div class="seccion">
+
+    <div class="seccion-titulo">
+      Modalidad
+    </div>
+
+    <div class="fila">
+
+      <button onclick="setMode('futbol')">
+        ⚽ Fútbol
+      </button>
+
+      <button onclick="setMode('futsal')">
+        🥅 Futsal
+      </button>
+
+    </div>
+
+    <div id="modeDisplay" style="text-align:center; margin-top:8px; color:#aaa;">
+      Fútbol
+    </div>
+
+  </div>
+
+
   <div class="marcador">
 
     <div class="equipo">
@@ -315,6 +342,7 @@ const matchRef =
 let home = 0;
 let away = 0;
 let seconds = 0;
+let gameMode = "futbol";
 
 let running = false;
 let currentPeriod = "1T";
@@ -348,6 +376,35 @@ const estadoElement =
 
 const partidoElement =
   document.getElementById("partido");
+
+const modeDisplay =
+  document.getElementById("modeDisplay");
+
+
+/* =========================
+   MODALIDAD
+========================= */
+
+function setMode(mode) {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+  gameMode = mode;
+
+  modeDisplay.textContent =
+    mode === "futsal"
+      ? "Futsal"
+      : "Fútbol";
+
+  matchRef.update({
+
+    gameMode:
+      mode
+
+  });
+}
 
 
 /* =========================
@@ -884,6 +941,9 @@ auth.signInAnonymously()
         addedTime =
           data.addedTime ?? null;
 
+        gameMode =
+          data.gameMode ?? "futbol";
+
         clockStartedAt =
           data.clockStartedAt ?? null;
 
@@ -900,6 +960,12 @@ auth.signInAnonymously()
           awayNameElement.textContent =
             data.awayName;
         }
+
+
+        modeDisplay.textContent =
+          gameMode === "futsal"
+            ? "Futsal"
+            : "Fútbol";
 
 
         updateScreen();
@@ -941,6 +1007,9 @@ auth.signInAnonymously()
 updateScreen();
 
 
+window.setMode =
+  setMode;
+
 window.homeGoal =
   homeGoal;
 
@@ -974,4 +1043,4 @@ window.resetMatch =
 </script>
 
 </body>
-  </html>
+</html>
