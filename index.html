@@ -39,11 +39,11 @@ border-bottom: 1px solid #286C96;
 
 .match {
   display: grid;
-  grid-template-columns: 1fr 220px 1fr;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr) 85px 220px 85px minmax(0, 1fr);
+  align-items: stretch;
   min-height: 95px;
-  padding: 5px 30px;
-  gap: 20px;
+  padding: 0;
+  gap: 0;
 }
 
 .team {
@@ -62,6 +62,36 @@ border-bottom: 1px solid #286C96;
 .team.away {
   justify-content: flex-start;
   text-align: left;
+}
+
+  .team.home,
+.team.away {
+  background: rgba(190, 160, 235, 0.96);
+  padding: 5px 15px;
+  gap: 12px;
+  min-width: 0;
+}
+
+.home-score-panel,
+.away-score-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #080808;
+  color: #fff;
+  font-size: 58px;
+  font-weight: 900;
+  line-height: 1;
+  min-width: 0;
+}
+
+.home-score-panel span,
+.away-score-panel span {
+  display: block;
+}
+
+.center {
+  background: rgba(190, 160, 235, 0.96);
 }
 
 .crest {
@@ -251,11 +281,11 @@ button:active {
 
 @media (max-width: 800px) {
 
-  .match {
-    grid-template-columns: 1fr 130px 1fr;
-    padding: 5px 10px;
-    gap: 8px;
-  }
+.match {
+  grid-template-columns: minmax(0, 1fr) 48px 110px 48px minmax(0, 1fr);
+  padding: 0;
+  gap: 0;
+}
 
   .team {
     font-size: 16px;
@@ -288,6 +318,22 @@ button:active {
   .halftime {
     font-size: 16px;
   }
+  .team.home,
+.team.away {
+  padding: 5px 3px;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.crest {
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+}
+
+.fouls {
+  font-size: 10px;
+}
 }
 </style>
 </head>
@@ -298,62 +344,50 @@ button:active {
 
   <div id="league" class="league">LIGA UNIVERSITARIA</div>
 
-  <div class="match">
+<div class="match">
 
-    <div class="team home">
-
-      <div>
-        <div id="homeName">EQUIPO LOCAL</div>
-
-        <div id="homeFouls" class="fouls">
-          FALTAS: 0
-        </div>
+  <div class="team home">
+    <div>
+      <div id="homeName">EQUIPO LOCAL</div>
+      <div id="homeFouls" class="fouls">
+        FALTAS: 0
       </div>
-
-      <div id="homeCrest" class="crest">A</div>
-
-      <div id="homeScore" class="score">0</div>
-
     </div>
+    <div id="homeCrest" class="crest">A</div>
+  </div>
 
+  <div class="score home-score-panel">
+    <span id="homeScore">0</span>
+  </div>
 
-    <div class="center">
+  <div class="center">
+    <div id="clock" class="clock">00:00</div>
+    <div id="period" class="period">1T</div>
+    <div id="firstLeg" class="first-leg">
+      <span class="first-leg-title">IDA:</span>
+      <span id="firstLegScore" class="first-leg-score">0 - 0</span>
+    </div>
+    <div id="halftime" class="halftime">
+      ENTRETIEMPO
+    </div>
+    <div id="addedTime" class="added-time"></div>
+  </div>
 
-      <div id="clock" class="clock">00:00</div>
+  <div class="score away-score-panel">
+    <span id="awayScore">0</span>
+  </div>
 
-      <div id="period" class="period">1T</div>
+  <div class="team away">
+    <div id="awayCrest" class="crest">B</div>
+    <div>
+      <div id="awayName">EQUIPO VISITANTE</div>
+      <div id="awayFouls" class="fouls">
+        FALTAS: 0
+      </div>
+    </div>
+  </div>
 
-      <div id="firstLeg" class="first-leg">
-  <span class="first-leg-title">IDA:</span>
-  <span id="firstLegScore" class="first-leg-score">0 - 0</span>
 </div>
-
-      <div id="halftime" class="halftime">
-        ENTRETIEMPO
-      </div>
-
-      <div id="addedTime" class="added-time"></div>
-
-    </div>
-
-
-    <div class="team away">
-
-      <div id="awayScore" class="score">0</div>
-
-      <div id="awayCrest" class="crest">B</div>
-
-      <div>
-        <div id="awayName">EQUIPO VISITANTE</div>
-
-        <div id="awayFouls" class="fouls">
-          FALTAS: 0
-        </div>
-      </div>
-
-    </div>
-
-    </div>
 
   <div id="penalties" class="penalties">
 
