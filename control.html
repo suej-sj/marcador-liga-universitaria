@@ -170,7 +170,7 @@ button:active {
     <div class="seccion-titulo">
       Modalidad
     </div>
-
+    
     <div class="fila">
 
       <button onclick="setMode('futbol')">
@@ -185,6 +185,100 @@ button:active {
 
     <div id="modeDisplay" style="text-align:center; margin-top:8px; color:#aaa;">
       Fútbol
+    </div>
+
+  </div>
+
+    <!-- BASE DE DATOS DE EQUIPOS -->
+
+  <div class="seccion">
+
+    <div class="seccion-titulo">
+      BASE DE DATOS DE EQUIPOS
+    </div>
+
+    <div class="equipo-nombre">
+      Registrar un equipo
+    </div>
+
+    <div class="fila">
+      <input
+        type="text"
+        id="newTeamName"
+        placeholder="Nombre del equipo"
+      >
+    </div>
+
+    <div class="fila">
+      <input
+        type="url"
+        id="newTeamCrest"
+        placeholder="URL del escudo (opcional)"
+      >
+    </div>
+
+    <div class="fila">
+      <label>
+        Color principal
+        <input
+          type="color"
+          id="newTeamPrimary"
+          value="#000000"
+        >
+      </label>
+
+      <label>
+        Color secundario
+        <input
+          type="color"
+          id="newTeamSecondary"
+          value="#FFFFFF"
+        >
+      </label>
+    </div>
+
+    <div class="fila">
+      <button onclick="saveTeam()">
+        GUARDAR EQUIPO
+      </button>
+    </div>
+
+    <hr>
+
+    <div class="seccion-titulo">
+      ASIGNAR EQUIPOS AL PARTIDO
+    </div>
+
+    <div class="equipo-nombre">
+      Equipo local
+    </div>
+
+    <div class="fila">
+      <select id="selectHomeTeam">
+        <option value="">Seleccionar equipo local</option>
+      </select>
+
+      <button onclick="assignHomeTeam()">
+        ASIGNAR LOCAL
+      </button>
+    </div>
+
+    <div class="equipo-nombre">
+      Equipo visitante
+    </div>
+
+    <div class="fila">
+      <select id="selectAwayTeam">
+        <option value="">Seleccionar equipo visitante</option>
+      </select>
+
+      <button onclick="assignAwayTeam()">
+        ASIGNAR VISITANTE
+      </button>
+    </div>
+
+    <div id="teamsStatus" class="estado">
+      Cargando equipos...
     </div>
 
   </div>
@@ -614,6 +708,220 @@ const partidoNumero =
 const matchRef =
   db.ref("matches/partido" + partidoNumero);
 
+  const teamsRef =
+  db.ref("teams");
+  
+/* =========================
+   BASE DE DATOS DE EQUIPOS
+========================= */
+
+let teamsData = {};
+
+
+function saveTeam() {
+
+  const name =
+    document.getElementById("newTeamName").value.trim();
+
+  const crestUrl =
+    document.getElementById("newTeamCrest").value.trim();
+
+  const primaryColor =
+    document.getElementById("newTeamPrimary").value;
+
+  const secondaryColor =
+    document.getElementById("newTeamSecondary").value;
+
+  const teamsStatus =
+    document.getElementById("teamsStatus");
+
+
+  if (!name) {
+
+    teamsStatus.textContent =
+      "Ingresá el nombre del equipo.";
+
+    return;
+  }
+
+
+  teamsRef.push({
+
+    name: name,
+
+    crestUrl: crestUrl,
+
+    primaryColor: primaryColor,
+
+    secondaryColor: secondaryColor
+
+  })
+
+  .then(function() {
+
+    document.getElementById("newTeamName").value = "";
+    document.getElementById("newTeamCrest").value = "";
+
+    teamsStatus.textContent =
+      "Equipo guardado correctamente.";
+
+  })
+
+  .catch(function(error) {
+
+    console.error(error);
+
+    teamsStatus.textContent =
+      "No se pudo guardar el equipo.";
+
+  });
+
+}
+
+
+function assignHomeTeam() {
+
+  const teamId =
+    document.getElementById("selectHomeTeam").value;
+
+  const team =
+    teamsData[teamId];
+
+
+  if (!team) {
+
+    document.getElementById("teamsStatus").textContent =
+      "Seleccioná un equipo local.";
+
+    return;
+  }
+
+
+  matchRef.update({
+
+    homeTeamId: teamId,
+
+    homeName: team.name,
+
+    homeCrest: team.crestUrl || "",
+
+    homePrimaryColor: team.primaryColor,
+
+    homeSecondaryColor: team.secondaryColor
+
+  })
+
+  .then(function() {
+
+    document.getElementById("teamsStatus").textContent =
+      team.name + " asignado como local.";
+
+  });
+
+}
+
+
+function assignAwayTeam() {
+
+  const teamId =
+    document.getElementById("selectAwayTeam").value;
+
+  const team =
+    teamsData[teamId];
+
+
+  if (!team) {
+
+    document.getElementById("teamsStatus").textContent =
+      "Seleccioná un equipo visitante.";
+
+    return;
+  }
+
+
+  matchRef.update({
+
+    awayTeamId: teamId,
+
+    awayName: team.name,
+
+    awayCrest: team.crestUrl || "",
+
+    awayPrimaryColor: team.primaryColor,
+
+    awaySecondaryColor: team.secondaryColor
+
+  })
+
+  .then(function() {
+
+    document.getElementById("teamsStatus").textContent =
+      team.name + " asignado como visitante.";
+
+  });
+
+}
+
+  /* =========================
+   CARGAR LISTA DE EQUIPOS
+========================= */
+
+function loadTeams() {
+
+  const homeSelect =
+    document.getElementById("selectHomeTeam");
+
+  const awaySelect =
+    document.getElementById("selectAwayTeam");
+
+  const teamsStatus =
+    document.getElementById("teamsStatus");
+
+
+  teamsRef.on("value", function(snapshot) {
+
+    teamsData = snapshot.val() || {};
+
+    homeSelect.innerHTML =
+      '<option value="">Seleccionar equipo local</option>';
+
+    awaySelect.innerHTML =
+      '<option value="">Seleccionar equipo visitante</option>';
+
+
+    Object.keys(teamsData).forEach(function(teamId) {
+
+      const team = teamsData[teamId];
+
+      const homeOption =
+        document.createElement("option");
+
+      homeOption.value = teamId;
+
+      homeOption.textContent = team.name;
+
+      homeSelect.appendChild(homeOption);
+
+
+      const awayOption =
+        document.createElement("option");
+
+      awayOption.value = teamId;
+
+      awayOption.textContent = team.name;
+
+      awaySelect.appendChild(awayOption);
+
+    });
+
+
+    teamsStatus.textContent =
+      Object.keys(teamsData).length +
+      " equipos disponibles.";
+
+  });
+
+}
 
 let home = 0;
 let away = 0;
@@ -1824,6 +2132,8 @@ console.log("Firebase cargado correctamente");
 auth.signInAnonymously()
 
   .then(function() {
+
+    loadTeams();
 
     console.log("AUTENTICACIÓN FIREBASE OK");
 
