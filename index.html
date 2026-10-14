@@ -1425,6 +1425,17 @@ showPenalties =
             data.homeName;
         }
 
+        if (data.homePrimaryColor) {
+  document.querySelector(".team.home").style.backgroundColor =
+    data.homePrimaryColor;
+}
+
+if (data.homeSecondaryColor) {
+  homeCrestElement.style.backgroundColor =
+    data.homeSecondaryColor;
+  homeCrestElement.style.borderColor =
+    data.homeSecondaryColor;
+}
 
         if (data.awayName) {
 
@@ -1432,20 +1443,41 @@ showPenalties =
             data.awayName;
         }
 
+          if (data.awayName) {
 
-        if (data.homeCrest) {
-
-          homeCrestElement.textContent =
-            data.homeCrest;
+          awayNameElement.textContent =
+            data.awayName;
         }
 
+       if (data.homeCrest) {
+  homeCrestElement.innerHTML = "";
 
-        if (data.awayCrest) {
+  const img = document.createElement("img");
+  img.src = data.homeCrest;
+  img.alt = "Escudo local";
 
-          awayCrestElement.textContent =
-            data.awayCrest;
-        }
+  img.style.width = "100%";
+  img.style.height = "100%";
+  img.style.objectFit = "contain";
+  img.style.borderRadius = "50%";
 
+  homeCrestElement.appendChild(img);
+}
+
+       if (data.awayCrest) {
+  awayCrestElement.innerHTML = "";
+
+  const img = document.createElement("img");
+  img.src = data.awayCrest;
+  img.alt = "Escudo visitante";
+
+  img.style.width = "100%";
+  img.style.height = "100%";
+  img.style.objectFit = "contain";
+  img.style.borderRadius = "50%";
+
+  awayCrestElement.appendChild(img);
+}
 
         updateScreen();
 
