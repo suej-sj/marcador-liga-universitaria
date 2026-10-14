@@ -928,13 +928,147 @@ function loadTeams() {
     });
 
 
+    
+    const savedTeamsList =
+      document.getElementById("savedTeamsList");
+
+    savedTeamsList.innerHTML = "";
+
+    Object.keys(teamsData).forEach(function(teamId) {
+      const team = teamsData[teamId];
+
+      const row = document.createElement("div");
+      row.style.display = "flex";
+      row.style.alignItems = "center";
+      row.style.justifyContent = "space-between";
+      row.style.gap = "10px";
+      row.style.padding = "10px";
+      row.style.marginBottom = "8px";
+      row.style.border = "1px solid #ccc";
+      row.style.borderRadius = "8px";
+
+      const info = document.createElement("div");
+      info.textContent = team.name || "Equipo sin nombre";
+      info.style.flex = "1";
+
+      const colors = document.createElement("div");
+      colors.style.display = "flex";
+      colors.style.gap = "4px";
+
+      const primary = document.createElement("span");
+      primary.style.width = "18px";
+      primary.style.height = "18px";
+      primary.style.borderRadius = "50%";
+      primary.style.backgroundColor = team.primaryColor || "#000000";
+
+      const secondary = document.createElement("span");
+      secondary.style.width = "18px";
+      secondary.style.height = "18px";
+      secondary.style.borderRadius = "50%";
+      secondary.style.backgroundColor = team.secondaryColor || "#FFFFFF";
+      secondary.style.border = "1px solid #999";
+
+      colors.appendChild(primary);
+      colors.appendChild(secondary);
+
+      const editButton = document.createElement("button");
+      editButton.textContent = "EDITAR";
+      editButton.onclick = function() {
+        editTeam(teamId);
+      };
+
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "ELIMINAR";
+      deleteButton.onclick = function() {
+        deleteTeam(teamId);
+      };
+
+      row.appendChild(info);
+      row.appendChild(colors);
+      row.appendChild(editButton);
+      row.appendChild(deleteButton);
+
+      savedTeamsList.appendChild(row);
+    });
+
     teamsStatus.textContent =
       Object.keys(teamsData).length +
       " equipos disponibles.";
 
+
   });
 
 }
+
+  
+function editTeam(teamId) {
+  const team = teamsData[teamId];
+
+  if (!team) return;
+
+  document.getElementById("newTeamName").value =
+    team.name || "";
+
+  document.getElementById("newTeamCrest").value =
+    team.crestUrl || "";
+
+  document.getElementById("newTeamPrimary").value =
+    team.primaryColor || "#000000";
+
+  document.getElementById("newTeamSecondary").value =
+    team.secondaryColor || "#FFFFFF";
+
+  editingTeamId = teamId;
+
+  document.getElementById("saveTeamButton").textContent =
+    "GUARDAR CAMBIOS";
+
+  document.getElementById("teamsStatus").textContent =
+    "Editando: " + team.name;
+}
+
+function deleteTeam(teamId) {
+  const team = teamsData[teamId];
+
+  if (!team) return;
+
+  if (!confirm(
+    '¿Seguro que querés eliminar "' +
+    team.name +
+    '" de la base de datos?'
+  )) {
+    return;
+  }
+
+  teamsRef.child(teamId).remove()
+    .then(function() {
+      if (editingTeamId === teamId) {
+        editingTeamId = null;
+
+        document.getElementById("newTeamName").value = "";
+        document.getElementById("newTeamCrest").value = "";
+
+        document.getElementById("newTeamPrimary").value =
+          "#000000";
+
+        document.getElementById("newTeamSecondary").value =
+          "#FFFFFF";
+
+        document.getElementById("saveTeamButton").textContent =
+          "GUARDAR EQUIPO";
+      }
+
+      document.getElementById("teamsStatus").textContent =
+        "Equipo eliminado correctamente.";
+    })
+    .catch(function(error) {
+      console.error(error);
+
+      document.getElementById("teamsStatus").textContent =
+        "No se pudo eliminar el equipo.";
+    });
+}
+
 
 let home = 0;
 let away = 0;
@@ -2376,6 +2510,8 @@ window.resetMatch =
 window.saveTeam = saveTeam;
 window.assignHomeTeam = assignHomeTeam;
 window.assignAwayTeam = assignAwayTeam;
+window.editTeam = editTeam;
+window.deleteTeam = deleteTeam;
   
 </script>
 
