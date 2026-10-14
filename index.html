@@ -1449,6 +1449,18 @@ if (data.homeSecondaryColor) {
             data.awayName;
         }
 
+        if (data.awayPrimaryColor) {
+  document.querySelector(".team.away").style.backgroundColor =
+    data.awayPrimaryColor;
+}
+
+if (data.awaySecondaryColor) {
+  awayCrestElement.style.backgroundColor =
+    data.awaySecondaryColor;
+  awayCrestElement.style.borderColor =
+    data.awaySecondaryColor;
+}
+
        if (data.homeCrest) {
   homeCrestElement.innerHTML = "";
 
