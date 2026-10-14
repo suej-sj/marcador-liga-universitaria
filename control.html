@@ -237,17 +237,29 @@ button:active {
       </label>
     </div>
 
-    <div class="fila">
-      <button onclick="saveTeam()">
-        GUARDAR EQUIPO
-      </button>
-    </div>
+    
+  <div class="fila">
+    <button id="saveTeamButton" onclick="saveTeam()">
+      GUARDAR EQUIPO
+    </button>
+  </div>
 
-    <hr>
+  <hr>
 
-    <div class="seccion-titulo">
-      ASIGNAR EQUIPOS AL PARTIDO
-    </div>
+  <div class="seccion-titulo">
+    EQUIPOS GUARDADOS
+  </div>
+
+  <div id="savedTeamsList">
+    Cargando equipos...
+  </div>
+
+  <hr>
+
+  <div class="seccion-titulo">
+    ASIGNAR EQUIPOS AL PARTIDO
+  </div>
+
 
     <div class="equipo-nombre">
       Equipo local
@@ -718,8 +730,10 @@ const matchRef =
 let teamsData = {};
 
 
-function saveTeam() {
 
+let editingTeamId = null;
+
+function saveTeam() {
   const name =
     document.getElementById("newTeamName").value.trim();
 
@@ -735,48 +749,47 @@ function saveTeam() {
   const teamsStatus =
     document.getElementById("teamsStatus");
 
-
   if (!name) {
-
     teamsStatus.textContent =
       "Ingresá el nombre del equipo.";
-
     return;
   }
 
-
-  teamsRef.push({
-
+  const teamData = {
     name: name,
-
     crestUrl: crestUrl,
-
     primaryColor: primaryColor,
-
     secondaryColor: secondaryColor
+  };
 
-  })
+  const saveOperation = editingTeamId
+    ? teamsRef.child(editingTeamId).update(teamData)
+    : teamsRef.push(teamData);
 
-  .then(function() {
+  saveOperation
+    .then(function() {
+      document.getElementById("newTeamName").value = "";
+      document.getElementById("newTeamCrest").value = "";
 
-    document.getElementById("newTeamName").value = "";
-    document.getElementById("newTeamCrest").value = "";
+      editingTeamId = null;
 
-    teamsStatus.textContent =
-      "Equipo guardado correctamente.";
+      document.getElementById("newTeamPrimary").value = "#000000";
+      document.getElementById("newTeamSecondary").value = "#FFFFFF";
 
-  })
+      document.getElementById("saveTeamButton").textContent =
+        "GUARDAR EQUIPO";
 
-  .catch(function(error) {
+      teamsStatus.textContent =
+        "Equipo guardado correctamente.";
+    })
+    .catch(function(error) {
+      console.error(error);
 
-    console.error(error);
-
-    teamsStatus.textContent =
-      "No se pudo guardar el equipo.";
-
-  });
-
+      teamsStatus.textContent =
+        "No se pudo guardar el equipo.";
+    });
 }
+
 
 
 function assignHomeTeam() {
