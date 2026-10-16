@@ -17,7 +17,10 @@ body {
   color: white;
 }
 
+
 .scoreboard {
+  position: relative;
+  isolation: isolate;
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
@@ -26,6 +29,23 @@ body {
   overflow: hidden;
   box-shadow: 0 8px 30px rgba(0,0,0,0.35);
 }
+
+.scoreboard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.04) 35%,
+    rgba(0, 0, 0, 0.00) 55%,
+    rgba(0, 0, 0, 0.16) 100%
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
 
 .league {
   text-align: center;
