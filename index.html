@@ -24,6 +24,8 @@ body {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
+  position: relative;
+  left: -8px;
   background: rgba(190, 160, 235, 0.96);
   border-radius: 14px;
   overflow: hidden;
@@ -535,7 +537,7 @@ button:active {
   position: absolute;
   z-index: 30;
   top: 36vh;
-  right: 18vw;
+  right: calc(18vw + 8px);
   width: min(82vw, 1160px);
   display: flex;
   flex-direction: column;
@@ -590,8 +592,8 @@ button:active {
   z-index: 100;
   top: 16px;
   right: 20px;
-  width: 138px;
-  height: 62px;
+  width: 300px;
+  height: 135px;
   pointer-events: none;
 }
 .permanent-brand-cycle img {
@@ -615,7 +617,7 @@ button:active {
   100% { opacity: 0; }
 }
 @media (max-width: 900px) {
-  .broadcast-stack { width: min(82vw, 1160px); right: 18vw; top: 34vh; }
+  .broadcast-stack { width: min(82vw, 1160px); right: calc(18vw + 8px); top: 34vh; }
   .presentation-card { padding: 26px 28px 22px; }
   .presentation-title { font-size: clamp(23px, 2.5vw, 31px); }
   .presentation-subtitle { font-size: clamp(17px, 1.8vw, 22px); }
@@ -629,7 +631,7 @@ button:active {
   .announcement-bar { grid-template-columns: 86px minmax(0,1fr) 82px; min-height: 128px; padding: 16px 20px; gap: 16px; }
   .announcement-crest, .announcement-brand { width: 78px; height: 78px; }
   .announcement-text { font-size: clamp(21px, 2.7vw, 29px); }
-  .permanent-brand-cycle { top: 12px; right: 14px; width: 112px; height: 52px; }
+  .permanent-brand-cycle { top: 12px; right: 14px; width: 270px; height: 120px; }
 }
 @media (prefers-reduced-motion: reduce) { .presentation-card, .announcement-bar, #scoreboard { transition: none; } }
 
