@@ -17,6 +17,7 @@ body {
   color: white;
 }
 
+
 .scoreboard {
   position: relative;
   isolation: isolate;
@@ -35,24 +36,25 @@ body {
   inset: 0;
   border-radius: inherit;
   background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.28) 0%,
-    rgba(255, 255, 255, 0.07) 35%,
-    rgba(0, 0, 0, 0.00) 55%,
-    rgba(0, 0, 0, 0.22) 100%
-  );
+  to bottom,
+  rgba(255, 255, 255, 0.28) 0%,
+  rgba(255, 255, 255, 0.07) 35%,
+  rgba(0, 0, 0, 0.00) 55%,
+  rgba(0, 0, 0, 0.22) 100%
+);
   pointer-events: none;
   z-index: 10;
 }
 
+
 .league {
   text-align: center;
-  font-size: 20px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 2px;
   padding: 10px 20px;
   background: #368DBB;
-  border-bottom: 1px solid #286C96;
+border-bottom: 1px solid #286C96;
 }
 
 .match {
@@ -82,7 +84,7 @@ body {
   text-align: left;
 }
 
-.team.home,
+ .team.home,
 .team.away {
   background: transparent;
   padding: 5px 15px;
@@ -124,14 +126,6 @@ body {
   font-size: 22px;
   font-weight: 900;
   flex-shrink: 0;
-  overflow: hidden;
-}
-
-.crest img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 50%;
 }
 
 .score {
@@ -144,23 +138,11 @@ body {
 
 .fouls {
   display: none;
-  width: fit-content;
   font-size: 20px;
-  font-weight: 800;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.72);
-  padding: 4px 8px;
-  border-radius: 5px;
+  font-weight: 700;
+  color: #24163B;
   margin-top: 6px;
   white-space: nowrap;
-}
-
-.team.home .fouls {
-  margin-left: auto;
-}
-
-.team.away .fouls {
-  margin-right: auto;
 }
 
 .center {
@@ -209,7 +191,7 @@ body {
   margin-top: 0;
 }
 
-.penalties {
+  .penalties {
   display: none;
   width: 100%;
   min-height: 48px;
@@ -319,11 +301,11 @@ button:active {
 
 @media (max-width: 800px) {
 
-  .match {
-    grid-template-columns: minmax(0, 1fr) 48px 110px 48px minmax(0, 1fr);
-    padding: 0;
-    gap: 0;
-  }
+.match {
+  grid-template-columns: minmax(0, 1fr) 48px 110px 48px minmax(0, 1fr);
+  padding: 0;
+  gap: 0;
+}
 
   .team {
     font-size: 16px;
@@ -356,23 +338,1255 @@ button:active {
   .halftime {
     font-size: 16px;
   }
-
   .team.home,
-  .team.away {
-    padding: 5px 3px;
-    gap: 4px;
-    font-size: 12px;
-  }
+.team.away {
+  padding: 5px 3px;
+  gap: 4px;
+  font-size: 12px;
+}
 
-  .crest {
-    width: 28px;
-    height: 28px;
-    font-size: 12px;
-  }
+.crest {
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+}
 
-  .fouls {
-    font-size: 10px;
-  }
+.fouls {
+  font-size: 10px;
+}
 }
 </style>
 </head>
+
+<body>
+
+<div class="scoreboard">
+
+  <div id="league" class="league">LIGA UNIVERSITARIA</div>
+
+<div class="match">
+
+  <div class="team home">
+    <div>
+      <div id="homeName">EQUIPO LOCAL</div>
+      <div id="homeFouls" class="fouls">
+        FALTAS: 0
+      </div>
+    </div>
+    <div id="homeCrest" class="crest">A</div>
+  </div>
+
+  <div class="score home-score-panel">
+    <span id="homeScore">0</span>
+  </div>
+
+  <div class="center">
+    <div id="clock" class="clock">00:00</div>
+    <div id="period" class="period">1T</div>
+    <div id="firstLeg" class="first-leg">
+      <span class="first-leg-title">IDA:</span>
+      <span id="firstLegScore" class="first-leg-score">0 - 0</span>
+    </div>
+    <div id="halftime" class="halftime">
+      ENTRETIEMPO
+    </div>
+    <div id="addedTime" class="added-time"></div>
+  </div>
+
+  <div class="score away-score-panel">
+    <span id="awayScore">0</span>
+  </div>
+
+  <div class="team away">
+    <div id="awayCrest" class="crest">B</div>
+    <div>
+      <div id="awayName">EQUIPO VISITANTE</div>
+      <div id="awayFouls" class="fouls">
+        FALTAS: 0
+      </div>
+    </div>
+  </div>
+
+</div>
+
+  <div id="penalties" class="penalties">
+
+    <div class="penalty-team home-penalty">
+  <div id="penaltyHomeResults" class="penalty-results">—</div>
+  <div id="penaltyHomeScore" class="penalty-score">0</div>
+</div>
+
+    <div class="penalty-center">
+      <div class="penalty-title">PENALES</div>
+    </div>
+
+    <div class="penalty-team away-penalty">
+      <div id="penaltyAwayScore" class="penalty-score">0</div>
+      <div id="penaltyAwayResults" class="penalty-results">—</div>
+    </div>
+
+  </div>
+
+
+  <div class="controls">
+    <button onclick="homeGoal()">+ Local</button>
+    <button onclick="awayGoal()">+ Visitante</button>
+
+    <button onclick="startClock()">▶ Iniciar</button>
+    <button onclick="pauseClock()">⏸ Pausar</button>
+
+    <button onclick="finishFirstHalf()">Finalizar 1T</button>
+    <button onclick="startSecondHalf()">Iniciar 2T</button>
+    <button onclick="finishMatch()">Finalizar partido</button>
+
+    <button onclick="showAddedTime(1)">+1</button>
+    <button onclick="showAddedTime(2)">+2</button>
+    <button onclick="showAddedTime(3)">+3</button>
+    <button onclick="showAddedTime(4)">+4</button>
+    <button onclick="showAddedTime(5)">+5</button>
+
+    <button onclick="hideAddedTime()">Ocultar adicional</button>
+
+    <button onclick="resetMatch()">↺ Reiniciar</button>
+
+  </div>
+
+
+  <div id="status" class="status">
+    Conectando con Firebase...
+  </div>
+
+</div>
+
+
+<!-- FIREBASE -->
+
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-database-compat.js"></script>
+
+
+<script>
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBZO-xr8s1iXC6RrSYYX3VSaqEs_1Vnj80",
+  authDomain: "suenos-en-juego-marcador.firebaseapp.com",
+  projectId: "suenos-en-juego-marcador",
+  storageBucket: "suenos-en-juego-marcador.firebasestorage.app",
+  messagingSenderId: "199445224003",
+  appId: "1:199445224003:web:62102f321ceb14231d52f6",
+  databaseURL: "https://suenos-en-juego-marcador-default-rtdb.firebaseio.com"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.database();
+
+const params =
+  new URLSearchParams(window.location.search);
+
+const partidoNumero =
+  params.get("partido") || "1";
+
+const matchRef =
+  db.ref("matches/partido" + partidoNumero);
+
+
+/* =========================
+   ESTADO DEL PARTIDO
+========================= */
+
+let home = 0;
+let away = 0;
+
+let homeFouls = 0;
+let awayFouls = 0;
+
+  let firstLegHomeScore = 0;
+let firstLegAwayScore = 0;
+let showFirstLeg = false;
+
+  let penaltyHomeResults = [];
+let penaltyAwayResults = [];
+let showPenalties = false;
+
+let seconds = 0;
+
+let gameMode = "futbol";
+
+let running = false;
+
+let currentPeriod = "1T";
+
+let addedTime = null;
+
+let clockStartedAt = null;
+
+let timer = null;
+
+let loadingFirebase = true;
+
+
+/* =========================
+   ELEMENTOS
+========================= */
+
+const homeScoreElement =
+  document.getElementById("homeScore");
+
+const awayScoreElement =
+  document.getElementById("awayScore");
+
+const homeFoulsElement =
+  document.getElementById("homeFouls");
+
+const awayFoulsElement =
+  document.getElementById("awayFouls");
+
+const clockElement =
+  document.getElementById("clock");
+
+const periodElement =
+  document.getElementById("period");
+
+  const firstLegElement =
+  document.getElementById("firstLeg");
+
+const firstLegScoreElement =
+  document.getElementById("firstLegScore");
+
+  const penaltiesElement =
+  document.getElementById("penalties");
+
+const penaltyHomeScoreElement =
+  document.getElementById("penaltyHomeScore");
+
+const penaltyAwayScoreElement =
+  document.getElementById("penaltyAwayScore");
+
+const penaltyHomeResultsElement =
+  document.getElementById("penaltyHomeResults");
+
+const penaltyAwayResultsElement =
+  document.getElementById("penaltyAwayResults");
+
+const halftimeElement =
+  document.getElementById("halftime");
+
+const addedTimeElement =
+  document.getElementById("addedTime");
+
+const statusElement =
+  document.getElementById("status");
+
+const leagueElement =
+  document.getElementById("league");
+
+const homeNameElement =
+  document.getElementById("homeName");
+
+const awayNameElement =
+  document.getElementById("awayName");
+
+const homeCrestElement =
+  document.getElementById("homeCrest");
+
+const awayCrestElement =
+  document.getElementById("awayCrest");
+
+
+/* =========================
+   RELOJ
+========================= */
+
+function getCurrentSeconds() {
+
+  if (!running || !clockStartedAt) {
+    return seconds;
+  }
+
+
+  const elapsed =
+    Math.floor(
+      (Date.now() - clockStartedAt) / 1000
+    );
+
+
+  if (gameMode === "futsal") {
+
+    return Math.max(
+      0,
+      seconds - Math.max(0, elapsed)
+    );
+
+  }
+
+
+  return seconds + Math.max(0, elapsed);
+}
+
+
+function updateClock() {
+
+  const currentSeconds =
+    getCurrentSeconds();
+
+
+  if (
+    gameMode === "futsal" &&
+    running &&
+    currentSeconds <= 0
+  ) {
+
+    seconds = 0;
+
+    running = false;
+
+    clockStartedAt = null;
+
+    stopLocalTimer();
+
+  }
+
+
+  const displaySeconds =
+    Math.max(0, currentSeconds);
+
+
+  const minutes =
+    Math.floor(displaySeconds / 60);
+
+  const secs =
+    displaySeconds % 60;
+
+
+  clockElement.textContent =
+    String(minutes).padStart(2, "0") +
+    ":" +
+    String(secs).padStart(2, "0");
+}
+
+
+/* =========================
+   PANTALLA
+========================= */
+
+function countPenaltyGoals(results) {
+  return results.filter(function(result) {
+    return result === "goal";
+  }).length;
+}
+
+function penaltySymbol(result) {
+  return result === "goal" ? "●" : "X";
+}
+
+function resultsToText(results) {
+  if (!results || results.length === 0) return "—";
+
+  return results.map(penaltySymbol).join(" ");
+}
+  
+  function updateScreen() {
+
+    leagueElement.textContent =
+  gameMode === "futsal"
+    ? "SUEÑOS EN JUEGO"
+    : "LIGA UNIVERSITARIA";
+
+  homeScoreElement.textContent =
+    home;
+
+  awayScoreElement.textContent =
+    away;
+
+  firstLegScoreElement.textContent =
+  firstLegHomeScore + " - " + firstLegAwayScore;
+
+if (showFirstLeg) {
+
+  firstLegElement.style.display =
+    "flex";
+
+} else {
+
+  firstLegElement.style.display =
+    "none";
+}
+
+  penaltyHomeScoreElement.textContent =
+  countPenaltyGoals(penaltyHomeResults);
+
+penaltyAwayScoreElement.textContent =
+  countPenaltyGoals(penaltyAwayResults);
+
+penaltyHomeResultsElement.textContent =
+  resultsToText(penaltyHomeResults);
+
+penaltyAwayResultsElement.textContent =
+  resultsToText(penaltyAwayResults);
+
+if (showPenalties) {
+  penaltiesElement.style.display = "grid";
+} else {
+  penaltiesElement.style.display = "none";
+}
+
+  homeFoulsElement.textContent =
+    "FALTAS: " + homeFouls;
+
+  awayFoulsElement.textContent =
+    "FALTAS: " + awayFouls;
+
+  /*
+    Las faltas solamente se muestran
+    cuando la modalidad es Futsal.
+  */
+
+  if (gameMode === "futsal") {
+
+    homeFoulsElement.style.display =
+      "block";
+
+    awayFoulsElement.style.display =
+      "block";
+
+  } else {
+
+    homeFoulsElement.style.display =
+      "none";
+
+    awayFoulsElement.style.display =
+      "none";
+  }
+
+
+  updateClock();
+
+
+  if (currentPeriod === "ENTRETIEMPO") {
+
+    clockElement.style.display =
+      "none";
+
+    periodElement.style.display =
+      "none";
+
+    halftimeElement.textContent =
+      "ENTRETIEMPO";
+
+    halftimeElement.style.display =
+      "block";
+
+  } else if (currentPeriod === "FINAL") {
+
+    clockElement.style.display =
+      "none";
+
+    periodElement.style.display =
+      "none";
+
+    halftimeElement.textContent =
+      "FINAL";
+
+    halftimeElement.style.display =
+      "block";
+
+  } else {
+
+    clockElement.style.display =
+      "block";
+
+    periodElement.style.display =
+      "block";
+
+    halftimeElement.style.display =
+      "none";
+
+    periodElement.textContent =
+      currentPeriod;
+  }
+
+
+  if (gameMode === "futsal") {
+  addedTimeElement.style.display = "none";
+} else {
+  addedTimeElement.style.display = "block";
+
+  if (addedTime !== null) {
+    addedTimeElement.textContent = "+" + addedTime + " adicional";
+  } else {
+    addedTimeElement.textContent = "";
+  }
+}
+}
+
+
+/* =========================
+   TIMER LOCAL
+========================= */
+
+function stopLocalTimer() {
+
+  if (timer !== null) {
+
+    clearInterval(timer);
+
+    timer = null;
+  }
+}
+
+
+function startLocalTimer() {
+
+  stopLocalTimer();
+
+  if (!running || !clockStartedAt) {
+    return;
+  }
+
+  timer =
+    setInterval(function() {
+
+      updateClock();
+
+    }, 250);
+}
+
+
+/* =========================
+   GUARDAR ESTADO
+========================= */
+
+function saveState(extraData) {
+
+  const baseData = {
+
+    league:
+      leagueElement.textContent,
+
+    homeName:
+      homeNameElement.textContent,
+
+    awayName:
+      awayNameElement.textContent,
+
+    homeCrest:
+      homeCrestElement.textContent,
+
+    awayCrest:
+      awayCrestElement.textContent,
+
+    homeScore:
+      home,
+
+    awayScore:
+      away,
+
+    homeFouls:
+      homeFouls,
+
+    awayFouls:
+      awayFouls,
+
+    seconds:
+      seconds,
+
+    gameMode:
+      gameMode,
+
+    running:
+      running,
+
+    period:
+      currentPeriod,
+
+    addedTime:
+      addedTime,
+
+    clockStartedAt:
+      clockStartedAt
+  };
+
+
+  if (extraData) {
+
+    Object.assign(
+      baseData,
+      extraData
+    );
+  }
+
+
+  return matchRef.update(
+    baseData
+  );
+}
+
+
+/* =========================
+   GOLES
+========================= */
+
+function homeGoal() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+  matchRef
+    .child("homeScore")
+    .transaction(function(currentValue) {
+
+      return (currentValue || 0) + 1;
+
+    });
+}
+
+
+function awayGoal() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+  matchRef
+    .child("awayScore")
+    .transaction(function(currentValue) {
+
+      return (currentValue || 0) + 1;
+
+    });
+}
+
+
+/* =========================
+   INICIAR RELOJ
+========================= */
+
+function startClock() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+  if (running) {
+    return;
+  }
+
+  if (
+    currentPeriod === "ENTRETIEMPO" ||
+    currentPeriod === "FINAL"
+  ) {
+    return;
+  }
+
+
+  running = true;
+
+  clockStartedAt =
+    Date.now();
+
+
+  updateScreen();
+
+  startLocalTimer();
+
+
+  matchRef.update({
+
+    running:
+      true,
+
+    seconds:
+      seconds,
+
+    gameMode:
+      gameMode,
+
+    clockStartedAt:
+      firebase.database.ServerValue.TIMESTAMP
+
+  });
+}
+
+
+/* =========================
+   PAUSAR RELOJ
+========================= */
+
+function pauseClock() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+
+  if (!running) {
+    return;
+  }
+
+
+  seconds =
+    getCurrentSeconds();
+
+  running = false;
+
+  clockStartedAt = null;
+
+
+  stopLocalTimer();
+
+  updateScreen();
+
+
+  matchRef.update({
+
+    seconds:
+      seconds,
+
+    running:
+      false,
+
+    clockStartedAt:
+      null
+
+  });
+}
+
+
+/* =========================
+   FINALIZAR PRIMER TIEMPO
+========================= */
+
+function finishFirstHalf() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+
+  if (running) {
+
+    seconds =
+      getCurrentSeconds();
+  }
+
+
+  running = false;
+
+  clockStartedAt = null;
+
+  stopLocalTimer();
+
+
+  currentPeriod =
+    "ENTRETIEMPO";
+
+
+  updateScreen();
+
+
+  matchRef.update({
+
+    seconds:
+      seconds,
+
+    running:
+      false,
+
+    clockStartedAt:
+      null,
+
+    period:
+      "ENTRETIEMPO"
+
+  });
+}
+
+
+/* =========================
+   INICIAR SEGUNDO TIEMPO
+========================= */
+
+function startSecondHalf() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+
+  stopLocalTimer();
+
+
+  if (gameMode === "futsal") {
+
+    seconds =
+      20 * 60;
+
+  } else {
+
+    seconds =
+      45 * 60;
+  }
+
+
+  currentPeriod =
+    "2T";
+
+  addedTime =
+    null;
+
+  running =
+    true;
+
+  clockStartedAt =
+    Date.now();
+
+
+  updateScreen();
+
+  startLocalTimer();
+
+
+  matchRef.update({
+
+    seconds:
+      seconds,
+
+    gameMode:
+      gameMode,
+
+    period:
+      "2T",
+
+    addedTime:
+      null,
+
+    running:
+      true,
+
+    clockStartedAt:
+      firebase.database.ServerValue.TIMESTAMP
+
+  });
+}
+
+
+/* =========================
+   FINALIZAR PARTIDO
+========================= */
+
+function finishMatch() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+
+  if (running) {
+
+    seconds =
+      getCurrentSeconds();
+  }
+
+
+  running = false;
+
+  clockStartedAt = null;
+
+  stopLocalTimer();
+
+
+  currentPeriod =
+    "FINAL";
+
+
+  updateScreen();
+
+
+  matchRef.update({
+
+    seconds:
+      seconds,
+
+    running:
+      false,
+
+    clockStartedAt:
+      null,
+
+    period:
+      "FINAL"
+
+  });
+}
+
+
+/* =========================
+   TIEMPO ADICIONAL
+========================= */
+
+function showAddedTime(minutes) {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+
+  addedTime =
+    minutes;
+
+
+  updateScreen();
+
+
+  matchRef.update({
+
+    addedTime:
+      minutes
+
+  });
+}
+
+
+function hideAddedTime() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+
+  addedTime =
+    null;
+
+
+  updateScreen();
+
+
+  matchRef.update({
+
+    addedTime:
+      null
+
+  });
+}
+
+
+/* =========================
+   REINICIAR
+========================= */
+
+function resetMatch() {
+
+  if (loadingFirebase) {
+    return;
+  }
+
+
+  stopLocalTimer();
+
+
+  home = 0;
+
+  away = 0;
+
+  homeFouls = 0;
+
+  awayFouls = 0;
+
+  seconds = 0;
+
+  running = false;
+
+  currentPeriod = "1T";
+
+  addedTime = null;
+
+  clockStartedAt = null;
+
+
+  updateScreen();
+
+
+  matchRef.update({
+
+    homeScore:
+      0,
+
+    awayScore:
+      0,
+
+    homeFouls:
+      0,
+
+    awayFouls:
+      0,
+
+    seconds:
+      0,
+
+    running:
+      false,
+
+    period:
+      "1T",
+
+    addedTime:
+      null,
+
+    clockStartedAt:
+      null,
+
+    gameMode:
+      gameMode
+
+  });
+}
+
+
+/* =========================
+   CONEXIÓN FIREBASE
+========================= */
+
+auth.signInAnonymously()
+
+  .then(function() {
+
+    statusElement.textContent =
+      "Firebase conectado · Partido " +
+      partidoNumero;
+
+
+    matchRef.on(
+      "value",
+      function(snapshot) {
+
+        const data =
+          snapshot.val();
+
+
+        if (!data) {
+
+          loadingFirebase =
+            false;
+
+
+          saveState();
+
+          return;
+        }
+
+
+        home =
+          data.homeScore ?? 0;
+
+        away =
+          data.awayScore ?? 0;
+
+        homeFouls =
+          data.homeFouls ?? 0;
+
+        awayFouls =
+          data.awayFouls ?? 0;
+
+        firstLegHomeScore =
+  data.firstLegHomeScore ?? 0;
+
+firstLegAwayScore =
+  data.firstLegAwayScore ?? 0;
+
+showFirstLeg =
+  data.showFirstLeg ?? false;
+
+        penaltyHomeResults =
+  Array.isArray(data.penaltyHomeResults)
+    ? data.penaltyHomeResults
+    : [];
+
+penaltyAwayResults =
+  Array.isArray(data.penaltyAwayResults)
+    ? data.penaltyAwayResults
+    : [];
+
+showPenalties =
+  data.showPenalties ?? false;
+
+        seconds =
+          data.seconds ?? 0;
+
+        gameMode =
+          data.gameMode ?? "futbol";
+
+        running =
+          data.running ?? false;
+
+        currentPeriod =
+          data.period ?? "1T";
+
+        addedTime =
+          data.addedTime ?? null;
+
+        clockStartedAt =
+          data.clockStartedAt ?? null;
+
+
+        if (data.league) {
+
+          leagueElement.textContent =
+            data.league;
+        }
+
+
+        if (data.homeName) {
+
+          homeNameElement.textContent =
+            data.homeName;
+        }
+
+        if (data.homePrimaryColor) {
+  document.querySelector(".team.home").style.backgroundColor =
+    data.homePrimaryColor;
+}
+
+if (data.homeSecondaryColor) {
+  homeCrestElement.style.backgroundColor =
+    data.homeSecondaryColor;
+  homeCrestElement.style.borderColor =
+    data.homeSecondaryColor;
+}
+
+        if (data.awayName) {
+
+          awayNameElement.textContent =
+            data.awayName;
+        }
+
+          if (data.awayName) {
+
+          awayNameElement.textContent =
+            data.awayName;
+        }
+
+        if (data.awayPrimaryColor) {
+  document.querySelector(".team.away").style.backgroundColor =
+    data.awayPrimaryColor;
+}
+
+if (data.awaySecondaryColor) {
+  awayCrestElement.style.backgroundColor =
+    data.awaySecondaryColor;
+  awayCrestElement.style.borderColor =
+    data.awaySecondaryColor;
+}
+
+       if (data.homeCrest) {
+  homeCrestElement.innerHTML = "";
+
+  const img = document.createElement("img");
+  img.src = data.homeCrest;
+  img.alt = "Escudo local";
+
+  img.style.width = "100%";
+  img.style.height = "100%";
+  img.style.objectFit = "contain";
+  img.style.borderRadius = "50%";
+
+  homeCrestElement.appendChild(img);
+}
+
+       if (data.awayCrest) {
+  awayCrestElement.innerHTML = "";
+
+  const img = document.createElement("img");
+  img.src = data.awayCrest;
+  img.alt = "Escudo visitante";
+
+  img.style.width = "100%";
+  img.style.height = "100%";
+  img.style.objectFit = "contain";
+  img.style.borderRadius = "50%";
+
+  awayCrestElement.appendChild(img);
+}
+
+        updateScreen();
+
+
+        loadingFirebase =
+          false;
+
+
+        if (running) {
+
+          startLocalTimer();
+
+        } else {
+
+          stopLocalTimer();
+
+        }
+
+      }
+    );
+
+  })
+
+
+  .catch(function(error) {
+
+    console.error(error);
+
+
+    statusElement.textContent =
+      "Error al conectar con Firebase";
+
+  });
+
+
+/* =========================
+   INICIO
+========================= */
+
+updateScreen();
+
+
+/* =========================
+   BOTONES HTML
+========================= */
+
+window.homeGoal =
+  homeGoal;
+
+window.awayGoal =
+  awayGoal;
+
+window.startClock =
+  startClock;
+
+window.pauseClock =
+  pauseClock;
+
+window.finishFirstHalf =
+  finishFirstHalf;
+
+window.startSecondHalf =
+  startSecondHalf;
+
+window.finishMatch =
+  finishMatch;
+
+window.showAddedTime =
+  showAddedTime;
+
+window.hideAddedTime =
+  hideAddedTime;
+
+window.resetMatch =
+  resetMatch;
+
+</script>
+
+</body>
+</html>
