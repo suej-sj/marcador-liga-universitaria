@@ -529,17 +529,17 @@ button:active {
 
 
 /* =========================
-   PRESENTACIÓN Y ZÓCALO
+   PRESENTACIÓN, ZÓCALO Y MARCA PERMANENTE
 ========================= */
 .broadcast-stack {
   position: absolute;
   z-index: 30;
   top: 36vh;
   right: 18vw;
-  width: min(78vw, 1100px);
+  width: min(82vw, 1160px);
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 24px;
   pointer-events: none;
 }
 .presentation-card, .announcement-bar {
@@ -551,7 +551,7 @@ button:active {
 }
 .presentation-card {
   width: 100%;
-  padding: 28px 34px 22px;
+  padding: 32px 38px 26px;
   border-radius: 18px;
   color: #fff;
   background: linear-gradient(145deg, rgba(24,24,29,.97), rgba(5,5,8,.96));
@@ -567,31 +567,69 @@ button:active {
   transition: opacity .3s ease, transform .3s ease, visibility .3s;
 }
 .scoreboard { transition: opacity .3s ease, transform .3s ease, visibility .3s; }
-.presentation-title { font-size: clamp(22px, 2vw, 30px); font-weight: 900; letter-spacing: 1.4px; line-height: 1.15; }
-.presentation-subtitle { margin-top: 9px; font-size: clamp(16px, 1.35vw, 21px); font-weight: 700; color: rgba(255,255,255,.76); letter-spacing: .6px; }
-.presentation-teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 24px; margin-top: 22px; }
-.presentation-team { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.presentation-crest { width: clamp(112px, 9vw, 150px); height: clamp(112px, 9vw, 150px); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 16px; background: rgba(255,255,255,.12); }
+.presentation-title { font-size: clamp(24px, 2.15vw, 33px); font-weight: 900; letter-spacing: 1.5px; line-height: 1.15; }
+.presentation-subtitle { margin-top: 10px; font-size: clamp(18px, 1.5vw, 23px); font-weight: 700; color: rgba(255,255,255,.82); letter-spacing: .6px; }
+.presentation-teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 28px; margin-top: 25px; }
+.presentation-team { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.presentation-crest { width: clamp(120px, 9.5vw, 160px); height: clamp(120px, 9.5vw, 160px); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 16px; background: rgba(255,255,255,.12); }
 .presentation-crest img { width: 100%; height: 100%; object-fit: contain; }
-.presentation-team-name { font-size: clamp(19px, 1.65vw, 25px); font-weight: 900; line-height: 1.1; overflow-wrap: anywhere; }
-.presentation-result { min-width: 170px; text-align: center; }
-.presentation-score { font-size: clamp(54px, 5vw, 72px); font-weight: 1000; line-height: 1; white-space: nowrap; }
-.presentation-first-leg { margin-top: 9px; font-size: 17px; color: rgba(255,255,255,.72); }
-.presentation-phase { margin-top: 9px; font-size: 19px; font-weight: 900; letter-spacing: 1.2px; }
-.presentation-brand { display: block; width: min(245px, 36%); max-height: 78px; object-fit: contain; margin: 20px auto 0; }
-.announcement-bar { width: 100%; min-height: 132px; padding: 18px 24px; display: grid; grid-template-columns: 96px minmax(0,1fr) 90px; align-items: center; gap: 22px; border-radius: 16px; color: #fff; background: var(--announcement-color, #242424); box-shadow: 0 7px 24px rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.25); }
-.announcement-crest, .announcement-brand { width: 88px; height: 88px; border-radius: 50%; object-fit: contain; display: flex; align-items: center; justify-content: center; overflow: hidden; background: rgba(255,255,255,.14); }
+.presentation-team-name { font-size: clamp(21px, 1.8vw, 28px); font-weight: 900; line-height: 1.12; overflow-wrap: anywhere; }
+.presentation-result { min-width: 185px; text-align: center; }
+.presentation-score { font-size: clamp(60px, 5.3vw, 78px); font-weight: 1000; line-height: 1; white-space: nowrap; }
+.presentation-first-leg { margin-top: 10px; font-size: 19px; color: rgba(255,255,255,.78); }
+.presentation-phase { margin-top: 10px; font-size: 21px; font-weight: 900; letter-spacing: 1.3px; }
+.presentation-brand { display: block; width: min(315px, 48%); max-height: 100px; object-fit: contain; margin: 22px auto 0; }
+.announcement-bar { width: 100%; min-height: 145px; padding: 20px 26px; display: grid; grid-template-columns: 104px minmax(0,1fr) 98px; align-items: center; gap: 24px; border-radius: 16px; color: #fff; background: var(--announcement-color, #242424); box-shadow: 0 7px 24px rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.25); }
+.announcement-crest, .announcement-brand { width: 94px; height: 94px; border-radius: 50%; object-fit: contain; display: flex; align-items: center; justify-content: center; overflow: hidden; background: rgba(255,255,255,.14); }
 .announcement-crest img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
-.announcement-text { text-align: center; font-size: clamp(22px, 2vw, 30px); font-weight: 900; line-height: 1.15; overflow-wrap: anywhere; }
+.announcement-text { text-align: center; font-size: clamp(24px, 2.2vw, 33px); font-weight: 900; line-height: 1.16; overflow-wrap: anywhere; }
+
+/* Marca SueJ fija en la esquina: alterna ambos logos en bucle, sin activación */
+.permanent-brand-cycle {
+  position: fixed;
+  z-index: 100;
+  top: 16px;
+  right: 20px;
+  width: 138px;
+  height: 62px;
+  pointer-events: none;
+}
+.permanent-brand-cycle img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,.45));
+}
+.permanent-brand-cycle .permanent-brand-full { animation: suejBrandFull 8s ease-in-out infinite; }
+.permanent-brand-cycle .permanent-brand-round { animation: suejBrandRound 8s ease-in-out infinite; }
+@keyframes suejBrandFull {
+  0%, 42% { opacity: 1; }
+  50%, 92% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes suejBrandRound {
+  0%, 42% { opacity: 0; }
+  50%, 92% { opacity: 1; }
+  100% { opacity: 0; }
+}
 @media (max-width: 900px) {
-  .broadcast-stack { width: min(78vw, 1100px); right: 18vw; top: 34vh; }
-  .presentation-card { padding: 22px 24px 18px; }
-  .presentation-crest { width: clamp(90px, 11vw, 120px); height: clamp(90px, 11vw, 120px); }
-  .presentation-team-name { font-size: clamp(17px, 2vw, 22px); }
-  .presentation-score { font-size: clamp(46px, 5vw, 60px); }
-  .announcement-bar { grid-template-columns: 76px minmax(0,1fr) 72px; min-height: 112px; padding: 14px 18px; gap: 14px; }
-  .announcement-crest, .announcement-brand { width: 70px; height: 70px; }
-  .announcement-text { font-size: clamp(19px, 2.4vw, 26px); }
+  .broadcast-stack { width: min(82vw, 1160px); right: 18vw; top: 34vh; }
+  .presentation-card { padding: 26px 28px 22px; }
+  .presentation-title { font-size: clamp(23px, 2.5vw, 31px); }
+  .presentation-subtitle { font-size: clamp(17px, 1.8vw, 22px); }
+  .presentation-crest { width: clamp(100px, 12vw, 132px); height: clamp(100px, 12vw, 132px); }
+  .presentation-team-name { font-size: clamp(19px, 2.2vw, 25px); }
+  .presentation-result { min-width: 165px; }
+  .presentation-score { font-size: clamp(52px, 5.5vw, 68px); }
+  .presentation-first-leg { font-size: 18px; }
+  .presentation-phase { font-size: 20px; }
+  .presentation-brand { width: min(290px, 52%); max-height: 90px; }
+  .announcement-bar { grid-template-columns: 86px minmax(0,1fr) 82px; min-height: 128px; padding: 16px 20px; gap: 16px; }
+  .announcement-crest, .announcement-brand { width: 78px; height: 78px; }
+  .announcement-text { font-size: clamp(21px, 2.7vw, 29px); }
+  .permanent-brand-cycle { top: 12px; right: 14px; width: 112px; height: 52px; }
 }
 @media (prefers-reduced-motion: reduce) { .presentation-card, .announcement-bar, #scoreboard { transition: none; } }
 
@@ -599,6 +637,11 @@ button:active {
 </head>
 
 <body>
+
+<div class="permanent-brand-cycle" aria-hidden="true">
+  <img class="permanent-brand-full" src="assets/suenos-en-juego.png" alt="">
+  <img class="permanent-brand-round" src="assets/logo-suej-circular.png" alt="">
+</div>
 
 <div class="scoreboard" id="scoreboard">
 
