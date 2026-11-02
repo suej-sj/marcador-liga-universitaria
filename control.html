@@ -366,6 +366,26 @@ button:active {
 
   </div>
 
+  <!-- PRESENTACIÓN Y ZÓCALO DE TRANSMISIÓN -->
+  <div class="seccion">
+    <div class="seccion-titulo">Presentación del partido</div>
+    <label for="presentationTitle">Título</label>
+    <input id="presentationTitle" type="text" placeholder="LIGA SANJUANINA DE FUTSAL" onblur="savePresentationSettings()">
+    <label for="presentationSubtitle">Subtítulo</label>
+    <input id="presentationSubtitle" type="text" placeholder="TORNEO CLAUSURA 2026 - FECHA 9" onblur="savePresentationSettings()">
+    <button id="presentationToggle" onclick="togglePresentation()">Mostrar presentación</button>
+
+    <div class="seccion-titulo" style="margin-top:16px;">Zócalo / anuncio</div>
+    <label for="announcementTeam">Escudo del anuncio</label>
+    <select id="announcementTeam" onchange="saveAnnouncementSettings()">
+      <option value="">Seleccionar equipo</option>
+    </select>
+    <label for="announcementText">Texto del anuncio</label>
+    <textarea id="announcementText" rows="3" placeholder="LA GRANJAH CAMPEÓN DEL TORNEO CLAUSURA DIVISIÓN B 2026" onblur="saveAnnouncementSettings()"></textarea>
+    <button id="announcementToggle" onclick="toggleAnnouncement()">Mostrar zócalo</button>
+    <div id="broadcastStatus" class="estado">Los cambios se sincronizan con el marcador.</div>
+  </div>
+
 
   <!-- RESULTADO DE IDA -->
 
@@ -727,6 +747,7 @@ const matchRef =
 ========================= */
 
 let teamsData = {};
+let selectedAnnouncementTeamId = "";
 
 
 
@@ -886,6 +907,9 @@ function loadTeams() {
   const awaySelect =
     document.getElementById("selectAwayTeam");
 
+  const announcementSelect =
+    document.getElementById("announcementTeam");
+
   const teamsStatus =
     document.getElementById("teamsStatus");
 
@@ -900,6 +924,8 @@ function loadTeams() {
     awaySelect.innerHTML =
       '<option value="">Seleccionar equipo visitante</option>';
 
+    announcementSelect.innerHTML =
+      '<option value="">Seleccionar equipo</option>';
 
     Object.keys(teamsData).forEach(function(teamId) {
 
@@ -924,9 +950,14 @@ function loadTeams() {
 
       awaySelect.appendChild(awayOption);
 
+      const announcementOption = document.createElement("option");
+      announcementOption.value = teamId;
+      announcementOption.textContent = team.name;
+      announcementSelect.appendChild(announcementOption);
+
     });
 
-
+    announcementSelect.value = selectedAnnouncementTeamId;
 
     const savedTeamsList =
       document.getElementById("savedTeamsList");
@@ -2268,6 +2299,41 @@ function resetMatch() {
   /* =========================
    FIREBASE
 ========================= */
+/* =========================
+   PRESENTACIÓN Y ZÓCALO
+========================= */
+
+function savePresentationSettings() {
+  return matchRef.update({
+    presentationTitle: document.getElementById("presentationTitle").value.trim(),
+    presentationSubtitle: document.getElementById("presentationSubtitle").value.trim()
+  });
+}
+
+function togglePresentation() {
+  const button = document.getElementById("presentationToggle");
+  const visible = button.dataset.visible === "true";
+  matchRef.update({ presentationVisible: !visible });
+}
+
+function saveAnnouncementSettings() {
+  const teamId = document.getElementById("announcementTeam").value;
+  const team = teamsData[teamId] || {};
+  return matchRef.update({
+    announcementTeamId: teamId,
+    announcementTeamName: team.name || "",
+    announcementTeamCrest: team.crestUrl || "",
+    announcementTeamColor: team.primaryColor || "#222222",
+    announcementText: document.getElementById("announcementText").value.trim()
+  });
+}
+
+function toggleAnnouncement() {
+  const button = document.getElementById("announcementToggle");
+  const visible = button.dataset.visible === "true";
+  matchRef.update({ announcementVisible: !visible });
+}
+
 console.log("Firebase cargado correctamente");
 
 auth.signInAnonymously()
@@ -2373,6 +2439,22 @@ auth.signInAnonymously()
             ? "Futsal"
             : "Fútbol";
 
+        const titleInput = document.getElementById("presentationTitle");
+        const subtitleInput = document.getElementById("presentationSubtitle");
+        const announcementInput = document.getElementById("announcementText");
+        const announcementSelect = document.getElementById("announcementTeam");
+        if (document.activeElement !== titleInput) titleInput.value = data.presentationTitle || "";
+        if (document.activeElement !== subtitleInput) subtitleInput.value = data.presentationSubtitle || "";
+        if (document.activeElement !== announcementInput) announcementInput.value = data.announcementText || "";
+        selectedAnnouncementTeamId = data.announcementTeamId || "";
+        if (announcementSelect) announcementSelect.value = selectedAnnouncementTeamId;
+
+        const presentationButton = document.getElementById("presentationToggle");
+        const announcementButton = document.getElementById("announcementToggle");
+        presentationButton.dataset.visible = String(data.presentationVisible === true);
+        presentationButton.textContent = data.presentationVisible === true ? "Ocultar presentación" : "Mostrar presentación";
+        announcementButton.dataset.visible = String(data.announcementVisible === true);
+        announcementButton.textContent = data.announcementVisible === true ? "Ocultar zócalo" : "Mostrar zócalo";
 
         updateScreen();
 
@@ -2506,6 +2588,10 @@ window.assignHomeTeam = assignHomeTeam;
 window.assignAwayTeam = assignAwayTeam;
 window.editTeam = editTeam;
 window.deleteTeam = deleteTeam;
+window.savePresentationSettings = savePresentationSettings;
+window.togglePresentation = togglePresentation;
+window.saveAnnouncementSettings = saveAnnouncementSettings;
+window.toggleAnnouncement = toggleAnnouncement;
 
 </script>
 
