@@ -170,7 +170,7 @@ button:active {
     <div class="seccion-titulo">
       Modalidad
     </div>
-    
+
     <div class="fila">
 
       <button onclick="setMode('futbol')">
@@ -189,108 +189,32 @@ button:active {
 
   </div>
 
-    <!-- BASE DE DATOS DE EQUIPOS -->
+    <!-- RELOJ -->
 
   <div class="seccion">
 
     <div class="seccion-titulo">
-      BASE DE DATOS DE EQUIPOS
+      Reloj
     </div>
 
-    <div class="equipo-nombre">
-      Registrar un equipo
+    <div id="clock" class="goles">
+      00:00
     </div>
 
-    <div class="fila">
-      <input
-        type="text"
-        id="newTeamName"
-        placeholder="Nombre del equipo"
-      >
+    <div id="period" style="text-align:center; margin-bottom:10px;">
+      1T
     </div>
 
     <div class="fila">
-      <input
-        type="url"
-        id="newTeamCrest"
-        placeholder="URL del escudo (opcional)"
-      >
-    </div>
 
-    <div class="fila">
-      <label>
-        Color principal
-        <input
-          type="color"
-          id="newTeamPrimary"
-          value="#000000"
-        >
-      </label>
-
-      <label>
-        Color secundario
-        <input
-          type="color"
-          id="newTeamSecondary"
-          value="#FFFFFF"
-        >
-      </label>
-    </div>
-
-    
-  <div class="fila">
-    <button id="saveTeamButton" onclick="saveTeam()">
-      GUARDAR EQUIPO
-    </button>
-  </div>
-
-  <hr>
-
-  <div class="seccion-titulo">
-    EQUIPOS GUARDADOS
-  </div>
-
-  <div id="savedTeamsList">
-    Cargando equipos...
-  </div>
-
-  <hr>
-
-  <div class="seccion-titulo">
-    ASIGNAR EQUIPOS AL PARTIDO
-  </div>
-
-
-    <div class="equipo-nombre">
-      Equipo local
-    </div>
-
-    <div class="fila">
-      <select id="selectHomeTeam">
-        <option value="">Seleccionar equipo local</option>
-      </select>
-
-      <button onclick="assignHomeTeam()">
-        ASIGNAR LOCAL
+      <button onclick="startClock()">
+        ▶ Iniciar
       </button>
-    </div>
 
-    <div class="equipo-nombre">
-      Equipo visitante
-    </div>
-
-    <div class="fila">
-      <select id="selectAwayTeam">
-        <option value="">Seleccionar equipo visitante</option>
-      </select>
-
-      <button onclick="assignAwayTeam()">
-        ASIGNAR VISITANTE
+      <button onclick="pauseClock()">
+        ⏸ Pausar
       </button>
-    </div>
 
-    <div id="teamsStatus" class="estado">
-      Cargando equipos...
     </div>
 
   </div>
@@ -412,6 +336,33 @@ button:active {
       </div>
 
     </div>
+
+  </div>
+
+
+  <!-- TIEMPO DE JUEGO -->
+
+  <div class="seccion">
+
+    <div class="seccion-titulo">
+      Tiempo de juego
+    </div>
+
+    <div class="fila">
+
+      <button onclick="finishFirstHalf()">
+        Finalizar 1T
+      </button>
+
+      <button onclick="startSecondHalf()">
+        Iniciar 2T
+      </button>
+
+    </div>
+
+    <button onclick="finishMatch()">
+      Finalizar partido
+    </button>
 
   </div>
 
@@ -572,60 +523,109 @@ button:active {
   </div>
 
 
-  <!-- RELOJ -->
+  <!-- BASE DE DATOS DE EQUIPOS -->
 
   <div class="seccion">
 
     <div class="seccion-titulo">
-      Reloj
+      BASE DE DATOS DE EQUIPOS
     </div>
 
-    <div id="clock" class="goles">
-      00:00
-    </div>
-
-    <div id="period" style="text-align:center; margin-bottom:10px;">
-      1T
+    <div class="equipo-nombre">
+      Registrar un equipo
     </div>
 
     <div class="fila">
-
-      <button onclick="startClock()">
-        ▶ Iniciar
-      </button>
-
-      <button onclick="pauseClock()">
-        ⏸ Pausar
-      </button>
-
+      <input
+        type="text"
+        id="newTeamName"
+        placeholder="Nombre del equipo"
+      >
     </div>
 
+    <div class="fila">
+      <input
+        type="url"
+        id="newTeamCrest"
+        placeholder="URL del escudo (opcional)"
+      >
+    </div>
+
+    <div class="fila">
+      <label>
+        Color principal
+        <input
+          type="color"
+          id="newTeamPrimary"
+          value="#000000"
+        >
+      </label>
+
+      <label>
+        Color secundario
+        <input
+          type="color"
+          id="newTeamSecondary"
+          value="#FFFFFF"
+        >
+      </label>
+    </div>
+
+
+  <div class="fila">
+    <button id="saveTeamButton" onclick="saveTeam()">
+      GUARDAR EQUIPO
+    </button>
+  </div>
+
+  <hr>
+
+  <div class="seccion-titulo">
+    EQUIPOS GUARDADOS
+  </div>
+
+  <div id="savedTeamsList">
+    Cargando equipos...
+  </div>
+
+  <hr>
+
+  <div class="seccion-titulo">
+    ASIGNAR EQUIPOS AL PARTIDO
   </div>
 
 
-  <!-- TIEMPO DE JUEGO -->
-
-  <div class="seccion">
-
-    <div class="seccion-titulo">
-      Tiempo de juego
+    <div class="equipo-nombre">
+      Equipo local
     </div>
 
     <div class="fila">
+      <select id="selectHomeTeam">
+        <option value="">Seleccionar equipo local</option>
+      </select>
 
-      <button onclick="finishFirstHalf()">
-        Finalizar 1T
+      <button onclick="assignHomeTeam()">
+        ASIGNAR LOCAL
       </button>
-
-      <button onclick="startSecondHalf()">
-        Iniciar 2T
-      </button>
-
     </div>
 
-    <button onclick="finishMatch()">
-      Finalizar partido
-    </button>
+    <div class="equipo-nombre">
+      Equipo visitante
+    </div>
+
+    <div class="fila">
+      <select id="selectAwayTeam">
+        <option value="">Seleccionar equipo visitante</option>
+      </select>
+
+      <button onclick="assignAwayTeam()">
+        ASIGNAR VISITANTE
+      </button>
+    </div>
+
+    <div id="teamsStatus" class="estado">
+      Cargando equipos...
+    </div>
 
   </div>
 
@@ -633,8 +633,7 @@ button:active {
   <!-- TIEMPO ADICIONAL -->
 
   <div class="seccion">
-
-    <div class="seccion-titulo">
+        <div class="seccion-titulo">
       Tiempo adicional
     </div>
 
@@ -722,7 +721,7 @@ const matchRef =
 
   const teamsRef =
   db.ref("teams");
-  
+
 /* =========================
    BASE DE DATOS DE EQUIPOS
 ========================= */
@@ -819,7 +818,7 @@ function assignHomeTeam() {
     homeCrest: team.crestUrl || "",
 
 homePrimaryColor: team.primaryColor || "",
-    
+
 homeSecondaryColor: team.secondaryColor || ""
 
   })
@@ -861,7 +860,7 @@ function assignAwayTeam() {
     awayCrest: team.crestUrl || "",
 
 awayPrimaryColor: team.primaryColor || "",
-    
+
 awaySecondaryColor: team.secondaryColor || ""
 
   })
@@ -928,7 +927,7 @@ function loadTeams() {
     });
 
 
-    
+
     const savedTeamsList =
       document.getElementById("savedTeamsList");
 
@@ -1000,7 +999,7 @@ function loadTeams() {
 
 }
 
-  
+
 function editTeam(teamId) {
   const team = teamsData[teamId];
 
@@ -1098,8 +1097,7 @@ let loadingFirebase = true;
 
 const homeScoreElement =
   document.getElementById("homeScore");
-
-const awayScoreElement =
+  const awayScoreElement =
   document.getElementById("awayScore");
 
 const homeFoulsElement =
@@ -1599,9 +1597,7 @@ function awayFoulDown() {
 
     });
 }
-
-
-/* =========================
+  /* =========================
    RESULTADO DE IDA
 ========================= */
 
@@ -2269,9 +2265,7 @@ function resetMatch() {
 
   });
 }
-
-
-/* =========================
+  /* =========================
    FIREBASE
 ========================= */
 console.log("Firebase cargado correctamente");
@@ -2512,7 +2506,7 @@ window.assignHomeTeam = assignHomeTeam;
 window.assignAwayTeam = assignAwayTeam;
 window.editTeam = editTeam;
 window.deleteTeam = deleteTeam;
-  
+
 </script>
 
 </body>
