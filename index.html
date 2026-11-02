@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control Marcador - Liga Universitaria</title>
+<title>Marcador Liga Universitaria</title>
 
 <style>
 * {
@@ -12,2502 +12,367 @@
 
 body {
   margin: 0;
-  padding: 20px;
-  background: #111;
-  color: white;
+  background: transparent;
   font-family: Arial, Helvetica, sans-serif;
+  color: white;
 }
 
-.panel {
+.scoreboard {
+  position: relative;
+  isolation: isolate;
   width: 100%;
-  max-width: 600px;
+  max-width: 1400px;
   margin: 0 auto;
+  background: rgba(190, 160, 235, 0.96);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
 }
 
-h1 {
+.scoreboard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.07) 35%,
+    rgba(0, 0, 0, 0.00) 55%,
+    rgba(0, 0, 0, 0.22) 100%
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+.league {
   text-align: center;
-  font-size: 24px;
-  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  padding: 10px 20px;
+  background: #368DBB;
+  border-bottom: 1px solid #286C96;
 }
 
-.partido {
-  text-align: center;
-  color: #aaa;
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
-.estado {
-  text-align: center;
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  background: #1d1d1d;
-  color: #aaa;
-}
-
-.marcador {
+.match {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 15px;
+  grid-template-columns: minmax(0, 1fr) 85px 220px 85px minmax(0, 1fr);
+  align-items: stretch;
+  min-height: 95px;
+  padding: 0;
+  gap: 0;
 }
 
-.equipo {
-  background: #1d1d1d;
-  border-radius: 12px;
-  padding: 15px;
+.team {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.team.home {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.team.away {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.team.home,
+.team.away {
+  background: transparent;
+  padding: 5px 15px;
+  gap: 12px;
+  min-width: 0;
+}
+
+.home-score-panel,
+.away-score-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #080808;
+  color: #fff;
+  font-size: 58px;
+  font-weight: 900;
+  line-height: 1;
+  min-width: 0;
+}
+
+.home-score-panel span,
+.away-score-panel span {
+  display: block;
+}
+
+.center {
+  background: rgba(190, 160, 235, 0.96);
+}
+
+.crest {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: #222;
+  border: 2px solid #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 900;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.crest img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.score {
+  font-size: 58px;
+  font-weight: 900;
+  line-height: 1;
+  min-width: 55px;
   text-align: center;
 }
 
-.equipo-nombre {
-  font-size: 15px;
-  font-weight: 700;
-  margin-bottom: 8px;
+.fouls {
+  display: none;
+  width: fit-content;
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.72);
+  padding: 4px 8px;
+  border-radius: 5px;
+  margin-top: 6px;
+  white-space: nowrap;
 }
 
-.goles {
-  font-size: 46px;
+.team.home .fouls {
+  margin-left: auto;
+}
+
+.team.away .fouls {
+  margin-right: auto;
+}
+
+.center {
+  text-align: center;
+  position: relative;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.clock {
+  font-size: 42px;
   font-weight: 900;
-  margin-bottom: 10px;
+  line-height: 1;
+  transition: opacity 0.25s, transform 0.25s;
+}
+
+.period {
+  font-size: 17px;
+  font-weight: 800;
+  margin-top: 7px;
+  letter-spacing: 1px;
+}
+
+.first-leg {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 4px;
+  line-height: 1;
+}
+
+.first-leg-title {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: #24163B;
+}
+
+.first-leg-score {
+  font-size: 18px;
+  font-weight: 900;
+  margin-top: 0;
+}
+
+.penalties {
+  display: none;
+  width: 100%;
+  min-height: 48px;
+  padding: 7px 20px;
+  background: #111;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 15px;
+}
+
+.penalty-team {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-penalty {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.away-penalty {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.penalty-score {
+  font-size: 22px;
+  font-weight: 900;
+  min-width: 22px;
+}
+
+.penalty-results {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.penalty-center {
+  text-align: center;
+}
+
+.penalty-title {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+
+.halftime {
+  display: none;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.added-time {
+  min-height: 24px;
+  margin-top: 7px;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  padding: 15px;
+  background: #151515;
+  border-top: 1px solid #333;
 }
 
 button {
-  width: 100%;
   border: 0;
-  border-radius: 9px;
-  padding: 13px;
-  margin-bottom: 8px;
+  border-radius: 8px;
+  padding: 10px 13px;
   background: #292929;
   color: white;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
 }
 
+button:hover {
+  background: #3b3b3b;
+}
+
 button:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
-.seccion {
-  background: #1d1d1d;
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 12px;
-}
-
-.seccion-titulo {
-  font-size: 13px;
-  color: #aaa;
-  margin-bottom: 10px;
+.status {
   text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.fila {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.danger {
-  background: #492020;
-}
-
-.faltas-numero {
-  font-size: 30px;
-  font-weight: 900;
-  text-align: center;
-  margin-bottom: 8px;
-}
-
-.penales-numero {
-  font-size: 28px;
-  font-weight: 900;
-  text-align: center;
-  margin-bottom: 8px;
-}
-
-.penales-registro {
-  text-align: center;
-  color: #aaa;
-  font-size: 14px;
-  min-height: 20px;
-  margin-bottom: 10px;
-  word-break: break-all;
-}
-
-.subtitulo-control {
-  text-align: center;
-  color: #aaa;
+  padding: 6px 10px;
   font-size: 12px;
-  margin-bottom: 8px;
+  color: #aaa;
+  background: #0d0d0d;
 }
 
+.controls,
+.status {
+  display: none;
+}
+
+@media (max-width: 800px) {
+
+  .match {
+    grid-template-columns: minmax(0, 1fr) 48px 110px 48px minmax(0, 1fr);
+    padding: 0;
+    gap: 0;
+  }
+
+  .team {
+    font-size: 16px;
+    gap: 8px;
+  }
+
+  .crest {
+    width: 45px;
+    height: 45px;
+    font-size: 16px;
+  }
+
+  .score {
+    font-size: 42px;
+    min-width: 40px;
+  }
+
+  .fouls {
+    font-size: 18px;
+  }
+
+  .clock {
+    font-size: 32px;
+  }
+
+  .period {
+    font-size: 14px;
+  }
+
+  .halftime {
+    font-size: 16px;
+  }
+
+  .team.home,
+  .team.away {
+    padding: 5px 3px;
+    gap: 4px;
+    font-size: 12px;
+  }
+
+  .crest {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .fouls {
+    font-size: 10px;
+  }
+}
 </style>
 </head>
-
-<body>
-
-<div class="panel">
-
-  <h1>CONTROL DEL MARCADOR</h1>
-
-  <div id="partido" class="partido">
-    Partido 1
-  </div>
-
-  <div id="estado" class="estado">
-    Conectando con Firebase...
-  </div>
-
-
-  <!-- MODALIDAD -->
-
-  <div class="seccion">
-
-    <div class="seccion-titulo">
-      Modalidad
-    </div>
-
-    <div class="fila">
-
-      <button onclick="setMode('futbol')">
-        ⚽ Fútbol
-      </button>
-
-      <button onclick="setMode('futsal')">
-        🥅 Futsal
-      </button>
-
-    </div>
-
-    <div id="modeDisplay" style="text-align:center; margin-top:8px; color:#aaa;">
-      Fútbol
-    </div>
-
-  </div>
-
-    <!-- RELOJ -->
-
-  <div class="seccion">
-
-    <div class="seccion-titulo">
-      Reloj
-    </div>
-
-    <div id="clock" class="goles">
-      00:00
-    </div>
-
-    <div id="period" style="text-align:center; margin-bottom:10px;">
-      1T
-    </div>
-
-    <div class="fila">
-
-      <button onclick="startClock()">
-        ▶ Iniciar
-      </button>
-
-      <button onclick="pauseClock()">
-        ⏸ Pausar
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- MARCADOR -->
-
-  <div class="marcador">
-
-    <div class="equipo">
-
-      <div id="homeName" class="equipo-nombre">
-        EQUIPO LOCAL
-      </div>
-
-      <div id="homeScore" class="goles">
-        0
-      </div>
-
-      <div class="fila">
-
-        <button onclick="homeGoal()">
-          + LOCAL
-        </button>
-
-        <button onclick="homeGoalDown()">
-          − LOCAL
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <div class="equipo">
-
-      <div id="awayName" class="equipo-nombre">
-        EQUIPO VISITANTE
-      </div>
-
-      <div id="awayScore" class="goles">
-        0
-      </div>
-
-      <div class="fila">
-
-        <button onclick="awayGoal()">
-          + VISITANTE
-        </button>
-
-        <button onclick="awayGoalDown()">
-          − VISITANTE
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- FALTAS -->
-
-  <div class="seccion">
-
-    <div class="seccion-titulo">
-      Faltas
-    </div>
-
-    <div class="marcador">
-
-      <div class="equipo">
-
-        <div class="equipo-nombre">
-          LOCAL
-        </div>
-
-        <div id="homeFouls" class="faltas-numero">
-          0
-        </div>
-
-        <div class="fila">
-
-          <button onclick="homeFoulDown()">
-            −1
-          </button>
-
-          <button onclick="homeFoulUp()">
-            +1
-          </button>
-
-        </div>
-
-      </div>
-
-
-      <div class="equipo">
-
-        <div class="equipo-nombre">
-          VISITANTE
-        </div>
-
-        <div id="awayFouls" class="faltas-numero">
-          0
-        </div>
-
-        <div class="fila">
-
-          <button onclick="awayFoulDown()">
-            −1
-          </button>
-
-          <button onclick="awayFoulUp()">
-            +1
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- TIEMPO DE JUEGO -->
-
-  <div class="seccion">
-
-    <div class="seccion-titulo">
-      Tiempo de juego
-    </div>
-
-    <div class="fila">
-
-      <button onclick="finishFirstHalf()">
-        Finalizar 1T
-      </button>
-
-      <button onclick="startSecondHalf()">
-        Iniciar 2T
-      </button>
-
-    </div>
-
-    <button onclick="finishMatch()">
-      Finalizar partido
-    </button>
-
-  </div>
-
-
-  <!-- RESULTADO DE IDA -->
-
-  <div class="seccion">
-
-    <div class="seccion-titulo">
-      Resultado de ida
-    </div>
-
-    <div class="marcador">
-
-      <div class="equipo">
-
-        <div class="equipo-nombre">
-          LOCAL
-        </div>
-
-        <div id="firstLegHomeScore" class="goles">
-          0
-        </div>
-
-        <div class="fila">
-
-          <button onclick="firstLegHomeUp()">
-            +1
-          </button>
-
-          <button onclick="firstLegHomeDown()">
-            −1
-          </button>
-
-        </div>
-
-      </div>
-
-
-      <div class="equipo">
-
-        <div class="equipo-nombre">
-          VISITANTE
-        </div>
-
-        <div id="firstLegAwayScore" class="goles">
-          0
-        </div>
-
-        <div class="fila">
-
-          <button onclick="firstLegAwayUp()">
-            +1
-          </button>
-
-          <button onclick="firstLegAwayDown()">
-            −1
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-
-    <button onclick="toggleFirstLeg()">
-      Mostrar / Ocultar ida
-    </button>
-
-    <div id="firstLegDisplay" style="text-align:center; color:#aaa;">
-      Oculto
-    </div>
-
-  </div>
-
-
-  <!-- TANDA DE PENALES -->
-
-  <div class="seccion">
-
-    <div class="seccion-titulo">
-      Tanda de penales
-    </div>
-
-    <button onclick="togglePenalties()">
-      Mostrar / Ocultar penales
-    </button>
-
-    <div class="marcador">
-
-      <div class="equipo">
-
-        <div class="equipo-nombre">
-          LOCAL
-        </div>
-
-        <div id="penaltyHomeScore" class="penales-numero">
-          0
-        </div>
-
-        <div class="subtitulo-control">
-          Convertidos
-        </div>
-
-        <button onclick="penaltyHomeGoal()">
-          GOL
-        </button>
-
-        <button onclick="penaltyHomeMiss()">
-          ERRADO
-        </button>
-
-        <button onclick="penaltyHomeCorrect()">
-          CORREGIR ÚLTIMO
-        </button>
-
-        <div id="penaltyHomeResults" class="penales-registro">
-          —
-        </div>
-
-      </div>
-
-
-      <div class="equipo">
-
-        <div class="equipo-nombre">
-          VISITANTE
-        </div>
-
-        <div id="penaltyAwayScore" class="penales-numero">
-          0
-        </div>
-
-        <div class="subtitulo-control">
-          Convertidos
-        </div>
-
-        <button onclick="penaltyAwayGoal()">
-          GOL
-        </button>
-
-        <button onclick="penaltyAwayMiss()">
-          ERRADO
-        </button>
-
-        <button onclick="penaltyAwayCorrect()">
-          CORREGIR ÚLTIMO
-        </button>
-
-        <div id="penaltyAwayResults" class="penales-registro">
-          —
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- BASE DE DATOS DE EQUIPOS -->
-
-  <div class="seccion">
-
-    <div class="seccion-titulo">
-      BASE DE DATOS DE EQUIPOS
-    </div>
-
-    <div class="equipo-nombre">
-      Registrar un equipo
-    </div>
-
-    <div class="fila">
-      <input
-        type="text"
-        id="newTeamName"
-        placeholder="Nombre del equipo"
-      >
-    </div>
-
-    <div class="fila">
-      <input
-        type="url"
-        id="newTeamCrest"
-        placeholder="URL del escudo (opcional)"
-      >
-    </div>
-
-    <div class="fila">
-      <label>
-        Color principal
-        <input
-          type="color"
-          id="newTeamPrimary"
-          value="#000000"
-        >
-      </label>
-
-      <label>
-        Color secundario
-        <input
-          type="color"
-          id="newTeamSecondary"
-          value="#FFFFFF"
-        >
-      </label>
-    </div>
-
-
-  <div class="fila">
-    <button id="saveTeamButton" onclick="saveTeam()">
-      GUARDAR EQUIPO
-    </button>
-  </div>
-
-  <hr>
-
-  <div class="seccion-titulo">
-    EQUIPOS GUARDADOS
-  </div>
-
-  <div id="savedTeamsList">
-    Cargando equipos...
-  </div>
-
-  <hr>
-
-  <div class="seccion-titulo">
-    ASIGNAR EQUIPOS AL PARTIDO
-  </div>
-
-
-    <div class="equipo-nombre">
-      Equipo local
-    </div>
-
-    <div class="fila">
-      <select id="selectHomeTeam">
-        <option value="">Seleccionar equipo local</option>
-      </select>
-
-      <button onclick="assignHomeTeam()">
-        ASIGNAR LOCAL
-      </button>
-    </div>
-
-    <div class="equipo-nombre">
-      Equipo visitante
-    </div>
-
-    <div class="fila">
-      <select id="selectAwayTeam">
-        <option value="">Seleccionar equipo visitante</option>
-      </select>
-
-      <button onclick="assignAwayTeam()">
-        ASIGNAR VISITANTE
-      </button>
-    </div>
-
-    <div id="teamsStatus" class="estado">
-      Cargando equipos...
-    </div>
-
-  </div>
-
-
-  <!-- TIEMPO ADICIONAL -->
-
-  <div class="seccion">
-        <div class="seccion-titulo">
-      Tiempo adicional
-    </div>
-
-    <div class="fila">
-
-      <button onclick="showAddedTime(1)">
-        +1
-      </button>
-
-      <button onclick="showAddedTime(2)">
-        +2
-      </button>
-
-      <button onclick="showAddedTime(3)">
-        +3
-      </button>
-
-      <button onclick="showAddedTime(4)">
-        +4
-      </button>
-
-      <button onclick="showAddedTime(5)">
-        +5
-      </button>
-
-      <button onclick="hideAddedTime()">
-        Ocultar
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- PARTIDO -->
-
-  <div class="seccion">
-
-    <div class="seccion-titulo">
-      Partido
-    </div>
-
-    <button class="danger" onclick="resetMatch()">
-      ↺ Reiniciar partido
-    </button>
-
-  </div>
-
-</div>
-
-
-<!-- FIREBASE -->
-
-<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-database-compat.js"></script>
-
-
-<script>
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBZO-xr8s1iXC6RrSYYX3VSaqEs_1Vnj80",
-  authDomain: "suenos-en-juego-marcador.firebaseapp.com",
-  projectId: "suenos-en-juego-marcador",
-  storageBucket: "suenos-en-juego-marcador.firebasestorage.app",
-  messagingSenderId: "199445224003",
-  appId: "1:199445224003:web:62102f321ceb14231d52f6",
-  databaseURL: "https://suenos-en-juego-marcador-default-rtdb.firebaseio.com"
-};
-
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const db = firebase.database();
-
-
-const params =
-  new URLSearchParams(window.location.search);
-
-const partidoNumero =
-  params.get("partido") || "1";
-
-const matchRef =
-  db.ref("matches/partido" + partidoNumero);
-
-  const teamsRef =
-  db.ref("teams");
-
-/* =========================
-   BASE DE DATOS DE EQUIPOS
-========================= */
-
-let teamsData = {};
-
-
-
-let editingTeamId = null;
-
-function saveTeam() {
-  const name =
-    document.getElementById("newTeamName").value.trim();
-
-  const crestUrl =
-    document.getElementById("newTeamCrest").value.trim();
-
-  const primaryColor =
-    document.getElementById("newTeamPrimary").value;
-
-  const secondaryColor =
-    document.getElementById("newTeamSecondary").value;
-
-  const teamsStatus =
-    document.getElementById("teamsStatus");
-
-  if (!name) {
-    teamsStatus.textContent =
-      "Ingresá el nombre del equipo.";
-    return;
-  }
-
-  const teamData = {
-    name: name,
-    crestUrl: crestUrl,
-    primaryColor: primaryColor,
-    secondaryColor: secondaryColor
-  };
-
-  const saveOperation = editingTeamId
-    ? teamsRef.child(editingTeamId).update(teamData)
-    : teamsRef.push(teamData);
-
-  saveOperation
-    .then(function() {
-      document.getElementById("newTeamName").value = "";
-      document.getElementById("newTeamCrest").value = "";
-
-      editingTeamId = null;
-
-      document.getElementById("newTeamPrimary").value = "#000000";
-      document.getElementById("newTeamSecondary").value = "#FFFFFF";
-
-      document.getElementById("saveTeamButton").textContent =
-        "GUARDAR EQUIPO";
-
-      teamsStatus.textContent =
-        "Equipo guardado correctamente.";
-    })
-    .catch(function(error) {
-      console.error(error);
-
-      teamsStatus.textContent =
-        "No se pudo guardar el equipo.";
-    });
-}
-
-
-
-function assignHomeTeam() {
-
-  const teamId =
-    document.getElementById("selectHomeTeam").value;
-
-  const team =
-    teamsData[teamId];
-
-
-  if (!team) {
-
-    document.getElementById("teamsStatus").textContent =
-      "Seleccioná un equipo local.";
-
-    return;
-  }
-
-
-  matchRef.update({
-
-    homeTeamId: teamId,
-
-    homeName: team.name,
-
-    homeCrest: team.crestUrl || "",
-
-homePrimaryColor: team.primaryColor || "",
-
-homeSecondaryColor: team.secondaryColor || ""
-
-  })
-
-  .then(function() {
-
-    document.getElementById("teamsStatus").textContent =
-      team.name + " asignado como local.";
-
-  });
-
-}
-
-
-function assignAwayTeam() {
-
-  const teamId =
-    document.getElementById("selectAwayTeam").value;
-
-  const team =
-    teamsData[teamId];
-
-
-  if (!team) {
-
-    document.getElementById("teamsStatus").textContent =
-      "Seleccioná un equipo visitante.";
-
-    return;
-  }
-
-
-  matchRef.update({
-
-    awayTeamId: teamId,
-
-    awayName: team.name,
-
-    awayCrest: team.crestUrl || "",
-
-awayPrimaryColor: team.primaryColor || "",
-
-awaySecondaryColor: team.secondaryColor || ""
-
-  })
-
-  .then(function() {
-
-    document.getElementById("teamsStatus").textContent =
-      team.name + " asignado como visitante.";
-
-  });
-
-}
-
-  /* =========================
-   CARGAR LISTA DE EQUIPOS
-========================= */
-
-function loadTeams() {
-
-  const homeSelect =
-    document.getElementById("selectHomeTeam");
-
-  const awaySelect =
-    document.getElementById("selectAwayTeam");
-
-  const teamsStatus =
-    document.getElementById("teamsStatus");
-
-
-  teamsRef.on("value", function(snapshot) {
-
-    teamsData = snapshot.val() || {};
-
-    homeSelect.innerHTML =
-      '<option value="">Seleccionar equipo local</option>';
-
-    awaySelect.innerHTML =
-      '<option value="">Seleccionar equipo visitante</option>';
-
-
-    Object.keys(teamsData).forEach(function(teamId) {
-
-      const team = teamsData[teamId];
-
-      const homeOption =
-        document.createElement("option");
-
-      homeOption.value = teamId;
-
-      homeOption.textContent = team.name;
-
-      homeSelect.appendChild(homeOption);
-
-
-      const awayOption =
-        document.createElement("option");
-
-      awayOption.value = teamId;
-
-      awayOption.textContent = team.name;
-
-      awaySelect.appendChild(awayOption);
-
-    });
-
-
-
-    const savedTeamsList =
-      document.getElementById("savedTeamsList");
-
-    savedTeamsList.innerHTML = "";
-
-    Object.keys(teamsData).forEach(function(teamId) {
-      const team = teamsData[teamId];
-
-      const row = document.createElement("div");
-      row.style.display = "flex";
-      row.style.alignItems = "center";
-      row.style.justifyContent = "space-between";
-      row.style.gap = "10px";
-      row.style.padding = "10px";
-      row.style.marginBottom = "8px";
-      row.style.border = "1px solid #ccc";
-      row.style.borderRadius = "8px";
-
-      const info = document.createElement("div");
-      info.textContent = team.name || "Equipo sin nombre";
-      info.style.flex = "1";
-
-      const colors = document.createElement("div");
-      colors.style.display = "flex";
-      colors.style.gap = "4px";
-
-      const primary = document.createElement("span");
-      primary.style.width = "18px";
-      primary.style.height = "18px";
-      primary.style.borderRadius = "50%";
-      primary.style.backgroundColor = team.primaryColor || "#000000";
-
-      const secondary = document.createElement("span");
-      secondary.style.width = "18px";
-      secondary.style.height = "18px";
-      secondary.style.borderRadius = "50%";
-      secondary.style.backgroundColor = team.secondaryColor || "#FFFFFF";
-      secondary.style.border = "1px solid #999";
-
-      colors.appendChild(primary);
-      colors.appendChild(secondary);
-
-      const editButton = document.createElement("button");
-      editButton.textContent = "EDITAR";
-      editButton.onclick = function() {
-        editTeam(teamId);
-      };
-
-      const deleteButton = document.createElement("button");
-      deleteButton.textContent = "ELIMINAR";
-      deleteButton.onclick = function() {
-        deleteTeam(teamId);
-      };
-
-      row.appendChild(info);
-      row.appendChild(colors);
-      row.appendChild(editButton);
-      row.appendChild(deleteButton);
-
-      savedTeamsList.appendChild(row);
-    });
-
-    teamsStatus.textContent =
-      Object.keys(teamsData).length +
-      " equipos disponibles.";
-
-
-  });
-
-}
-
-
-function editTeam(teamId) {
-  const team = teamsData[teamId];
-
-  if (!team) return;
-
-  document.getElementById("newTeamName").value =
-    team.name || "";
-
-  document.getElementById("newTeamCrest").value =
-    team.crestUrl || "";
-
-  document.getElementById("newTeamPrimary").value =
-    team.primaryColor || "#000000";
-
-  document.getElementById("newTeamSecondary").value =
-    team.secondaryColor || "#FFFFFF";
-
-  editingTeamId = teamId;
-
-  document.getElementById("saveTeamButton").textContent =
-    "GUARDAR CAMBIOS";
-
-  document.getElementById("teamsStatus").textContent =
-    "Editando: " + team.name;
-}
-
-function deleteTeam(teamId) {
-  const team = teamsData[teamId];
-
-  if (!team) return;
-
-  if (!confirm(
-    '¿Seguro que querés eliminar "' +
-    team.name +
-    '" de la base de datos?'
-  )) {
-    return;
-  }
-
-  teamsRef.child(teamId).remove()
-    .then(function() {
-      if (editingTeamId === teamId) {
-        editingTeamId = null;
-
-        document.getElementById("newTeamName").value = "";
-        document.getElementById("newTeamCrest").value = "";
-
-        document.getElementById("newTeamPrimary").value =
-          "#000000";
-
-        document.getElementById("newTeamSecondary").value =
-          "#FFFFFF";
-
-        document.getElementById("saveTeamButton").textContent =
-          "GUARDAR EQUIPO";
-      }
-
-      document.getElementById("teamsStatus").textContent =
-        "Equipo eliminado correctamente.";
-    })
-    .catch(function(error) {
-      console.error(error);
-
-      document.getElementById("teamsStatus").textContent =
-        "No se pudo eliminar el equipo.";
-    });
-}
-
-
-let home = 0;
-let away = 0;
-
-let homeFouls = 0;
-let awayFouls = 0;
-
-let firstLegHomeScore = 0;
-let firstLegAwayScore = 0;
-let showFirstLeg = false;
-
-let penaltyHomeResults = [];
-let penaltyAwayResults = [];
-let showPenalties = false;
-
-let seconds = 0;
-let gameMode = "futbol";
-
-let running = false;
-let currentPeriod = "1T";
-let addedTime = null;
-let clockStartedAt = null;
-
-let timer = null;
-let loadingFirebase = true;
-
-
-const homeScoreElement =
-  document.getElementById("homeScore");
-  const awayScoreElement =
-  document.getElementById("awayScore");
-
-const homeFoulsElement =
-  document.getElementById("homeFouls");
-
-const awayFoulsElement =
-  document.getElementById("awayFouls");
-
-const homeNameElement =
-  document.getElementById("homeName");
-
-const awayNameElement =
-  document.getElementById("awayName");
-
-const clockElement =
-  document.getElementById("clock");
-
-const periodElement =
-  document.getElementById("period");
-
-const estadoElement =
-  document.getElementById("estado");
-
-const partidoElement =
-  document.getElementById("partido");
-
-const modeDisplay =
-  document.getElementById("modeDisplay");
-
-const firstLegHomeScoreElement =
-  document.getElementById("firstLegHomeScore");
-
-const firstLegAwayScoreElement =
-  document.getElementById("firstLegAwayScore");
-
-const firstLegDisplayElement =
-  document.getElementById("firstLegDisplay");
-
-const penaltyHomeScoreElement =
-  document.getElementById("penaltyHomeScore");
-
-const penaltyAwayScoreElement =
-  document.getElementById("penaltyAwayScore");
-
-const penaltyHomeResultsElement =
-  document.getElementById("penaltyHomeResults");
-
-const penaltyAwayResultsElement =
-  document.getElementById("penaltyAwayResults");
-
-
-/* =========================
-   MODALIDAD
-========================= */
-
-function setMode(mode) {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  gameMode = mode;
-
-
-  if (
-    mode === "futsal" &&
-    !running &&
-    currentPeriod === "1T" &&
-    seconds <= 0
-  ) {
-
-    seconds =
-      20 * 60;
-  }
-
-
-  if (
-    mode === "futbol" &&
-    !running &&
-    currentPeriod === "1T" &&
-    seconds === 20 * 60
-  ) {
-
-    seconds =
-      0;
-  }
-
-
-  modeDisplay.textContent =
-    mode === "futsal"
-      ? "Futsal"
-      : "Fútbol";
-
-
-  updateScreen();
-
-
-  matchRef.update({
-
-    gameMode:
-      mode,
-
-    seconds:
-      seconds
-
-  });
-}
-
-
-/* =========================
-   RELOJ
-========================= */
-
-function getCurrentSeconds() {
-
-  if (!running || !clockStartedAt) {
-    return seconds;
-  }
-
-
-  const elapsed =
-    Math.floor(
-      (Date.now() - clockStartedAt) / 1000
-    );
-
-
-  if (gameMode === "futsal") {
-
-    return Math.max(
-      0,
-      seconds - Math.max(0, elapsed)
-    );
-  }
-
-
-  return seconds + Math.max(0, elapsed);
-}
-
-
-function updateClock() {
-
-  const currentSeconds =
-    getCurrentSeconds();
-
-
-  if (
-    gameMode === "futsal" &&
-    running &&
-    currentSeconds <= 0
-  ) {
-
-    seconds =
-      0;
-
-    running =
-      false;
-
-    clockStartedAt =
-      null;
-
-    stopLocalTimer();
-
-    clockElement.textContent =
-      "00:00";
-
-    estadoElement.textContent =
-      "TIEMPO AGOTADO";
-
-
-    matchRef.update({
-
-      seconds:
-        0,
-
-      running:
-        false,
-
-      clockStartedAt:
-        null
-
-    });
-
-    return;
-  }
-
-
-  const minutes =
-    Math.floor(currentSeconds / 60);
-
-  const secs =
-    currentSeconds % 60;
-
-
-  clockElement.textContent =
-    String(minutes).padStart(2, "0") +
-    ":" +
-    String(secs).padStart(2, "0");
-}
-
-
-function stopLocalTimer() {
-
-  if (timer !== null) {
-
-    clearInterval(timer);
-
-    timer = null;
-  }
-}
-
-
-function startLocalTimer() {
-
-  stopLocalTimer();
-
-  if (!running || !clockStartedAt) {
-    return;
-  }
-
-  timer =
-    setInterval(function() {
-
-      updateClock();
-
-    }, 250);
-}
-
-
-/* =========================
-   MOSTRAR DATOS
-========================= */
-
-function countPenaltyGoals(results) {
-
-  return results.filter(function(result) {
-    return result === "goal";
-  }).length;
-}
-
-
-function penaltySymbol(result) {
-
-  return result === "goal"
-    ? "●"
-    : "X";
-}
-
-
-function resultsToText(results) {
-
-  if (!results || results.length === 0) {
-    return "—";
-  }
-
-  return results
-    .map(penaltySymbol)
-    .join(" ");
-}
-
-
-function updateScreen() {
-
-  homeScoreElement.textContent =
-    home;
-
-  awayScoreElement.textContent =
-    away;
-
-  homeFoulsElement.textContent =
-    homeFouls;
-
-  awayFoulsElement.textContent =
-    awayFouls;
-
-
-  firstLegHomeScoreElement.textContent =
-    firstLegHomeScore;
-
-  firstLegAwayScoreElement.textContent =
-    firstLegAwayScore;
-
-
-  penaltyHomeScoreElement.textContent =
-    countPenaltyGoals(
-      penaltyHomeResults
-    );
-
-  penaltyAwayScoreElement.textContent =
-    countPenaltyGoals(
-      penaltyAwayResults
-    );
-
-
-  penaltyHomeResultsElement.textContent =
-    resultsToText(
-      penaltyHomeResults
-    );
-
-  penaltyAwayResultsElement.textContent =
-    resultsToText(
-      penaltyAwayResults
-    );
-
-
-  if (showFirstLeg) {
-
-    firstLegDisplayElement.textContent =
-      "MOSTRANDO";
-
-  } else {
-
-    firstLegDisplayElement.textContent =
-      "Oculto";
-  }
-
-
-  updateClock();
-
-  periodElement.textContent =
-    currentPeriod;
-
-
-  if (currentPeriod === "ENTRETIEMPO") {
-
-    estadoElement.textContent =
-      "ENTRETIEMPO";
-
-  } else if (currentPeriod === "FINAL") {
-
-    estadoElement.textContent =
-      "FINAL";
-
-  } else if (running) {
-
-    estadoElement.textContent =
-      "RELOJ EN MARCHA";
-
-  } else if (
-    gameMode === "futsal" &&
-    seconds === 0
-  ) {
-
-    estadoElement.textContent =
-      "TIEMPO AGOTADO";
-
-  } else {
-
-    estadoElement.textContent =
-      "RELOJ PAUSADO";
-  }
-}
-
-
-/* =========================
-   GOLES
-========================= */
-
-function homeGoal() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  matchRef
-    .child("homeScore")
-    .transaction(function(currentValue) {
-
-      return (currentValue || 0) + 1;
-
-    });
-}
-
-
-function awayGoal() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  matchRef
-    .child("awayScore")
-    .transaction(function(currentValue) {
-
-      return (currentValue || 0) + 1;
-
-    });
-}
-
-
-function homeGoalDown() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  matchRef
-    .child("homeScore")
-    .transaction(function(currentValue) {
-
-      return Math.max(
-        0,
-        (currentValue || 0) - 1
-      );
-
-    });
-}
-
-
-function awayGoalDown() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  matchRef
-    .child("awayScore")
-    .transaction(function(currentValue) {
-
-      return Math.max(
-        0,
-        (currentValue || 0) - 1
-      );
-
-    });
-}
-
-
-/* =========================
-   FALTAS
-========================= */
-
-function homeFoulUp() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  matchRef
-    .child("homeFouls")
-    .transaction(function(currentValue) {
-
-      return (currentValue || 0) + 1;
-
-    });
-}
-
-
-function homeFoulDown() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  matchRef
-    .child("homeFouls")
-    .transaction(function(currentValue) {
-
-      return Math.max(
-        0,
-        (currentValue || 0) - 1
-      );
-
-    });
-}
-
-
-function awayFoulUp() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  matchRef
-    .child("awayFouls")
-    .transaction(function(currentValue) {
-
-      return (currentValue || 0) + 1;
-
-    });
-}
-
-
-function awayFoulDown() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  matchRef
-    .child("awayFouls")
-    .transaction(function(currentValue) {
-
-      return Math.max(
-        0,
-        (currentValue || 0) - 1
-      );
-
-    });
-}
-  /* =========================
-   RESULTADO DE IDA
-========================= */
-
-function firstLegHomeUp() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  matchRef
-    .child("firstLegHomeScore")
-    .transaction(function(currentValue) {
-
-      return (currentValue || 0) + 1;
-
-    });
-}
-
-
-function firstLegHomeDown() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  matchRef
-    .child("firstLegHomeScore")
-    .transaction(function(currentValue) {
-
-      return Math.max(
-        0,
-        (currentValue || 0) - 1
-      );
-
-    });
-}
-
-
-function firstLegAwayUp() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  matchRef
-    .child("firstLegAwayScore")
-    .transaction(function(currentValue) {
-
-      return (currentValue || 0) + 1;
-
-    });
-}
-
-
-function firstLegAwayDown() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  matchRef
-    .child("firstLegAwayScore")
-    .transaction(function(currentValue) {
-
-      return Math.max(
-        0,
-        (currentValue || 0) - 1
-      );
-
-    });
-}
-
-
-function toggleFirstLeg() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  showFirstLeg =
-    !showFirstLeg;
-
-
-  matchRef.update({
-
-    showFirstLeg:
-      showFirstLeg
-
-  });
-}
-
-
-/* =========================
-   TANDA DE PENALES
-========================= */
-
-function togglePenalties() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  showPenalties =
-    !showPenalties;
-    matchRef.update({
-
-    showPenalties:
-      showPenalties
-
-  });
-}
-
-
-function addPenaltyResult(
-  team,
-  result
-) {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-
-  const path =
-    team === "home"
-      ? "penaltyHomeResults"
-      : "penaltyAwayResults";
-
-
-  matchRef
-    .child(path)
-    .transaction(function(currentValue) {
-
-      const results =
-        Array.isArray(currentValue)
-          ? currentValue.slice()
-          : [];
-
-      results.push(result);
-
-      return results;
-
-    });
-}
-
-
-function correctPenalty(team) {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-
-  const path =
-    team === "home"
-      ? "penaltyHomeResults"
-      : "penaltyAwayResults";
-
-
-  matchRef
-    .child(path)
-    .transaction(function(currentValue) {
-
-      const results =
-        Array.isArray(currentValue)
-          ? currentValue.slice()
-          : [];
-
-      if (results.length === 0) {
-        return results;
-      }
-
-      results.pop();
-
-      return results;
-
-    });
-}
-
-
-function penaltyHomeGoal() {
-
-  addPenaltyResult(
-    "home",
-    "goal"
-  );
-}
-
-
-function penaltyHomeMiss() {
-
-  addPenaltyResult(
-    "home",
-    "miss"
-  );
-}
-
-
-function penaltyHomeCorrect() {
-
-  correctPenalty(
-    "home"
-  );
-}
-
-
-function penaltyAwayGoal() {
-
-  addPenaltyResult(
-    "away",
-    "goal"
-  );
-}
-
-
-function penaltyAwayMiss() {
-
-  addPenaltyResult(
-    "away",
-    "miss"
-  );
-}
-
-
-function penaltyAwayCorrect() {
-
-  correctPenalty(
-    "away"
-  );
-}
-
-
-/* =========================
-   RELOJ
-========================= */
-
-function startClock() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  if (running) {
-    return;
-  }
-
-  if (
-    currentPeriod === "ENTRETIEMPO" ||
-    currentPeriod === "FINAL"
-  ) {
-    return;
-  }
-
-
-  if (
-    gameMode === "futsal" &&
-    currentPeriod === "1T" &&
-    seconds <= 0
-  ) {
-
-    seconds =
-      20 * 60;
-  }
-
-
-  if (
-    gameMode === "futsal" &&
-    currentPeriod === "2T" &&
-    seconds <= 0
-  ) {
-
-    return;
-  }
-
-
-  running = true;
-
-  clockStartedAt =
-    Date.now();
-
-
-  startLocalTimer();
-
-  updateScreen();
-
-
-  matchRef.update({
-
-    running:
-      true,
-
-    seconds:
-      seconds,
-
-    clockStartedAt:
-      firebase.database.ServerValue.TIMESTAMP
-
-  });
-}
-
-
-function pauseClock() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-  if (!running) {
-    return;
-  }
-
-
-  seconds =
-    getCurrentSeconds();
-
-  running = false;
-
-  clockStartedAt = null;
-
-  stopLocalTimer();
-
-  updateScreen();
-
-
-  matchRef.update({
-
-    seconds:
-      seconds,
-
-    running:
-      false,
-
-    clockStartedAt:
-      null
-
-  });
-}
-
-
-/* =========================
-   PRIMER TIEMPO
-========================= */
-
-function finishFirstHalf() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-
-  if (running) {
-
-    seconds =
-      getCurrentSeconds();
-  }
-
-
-  running = false;
-
-  clockStartedAt = null;
-
-  stopLocalTimer();
-
-  currentPeriod =
-    "ENTRETIEMPO";
-
-
-  updateScreen();
-
-
-  matchRef.update({
-
-    seconds:
-      seconds,
-
-    running:
-      false,
-
-    clockStartedAt:
-      null,
-
-    period:
-      "ENTRETIEMPO"
-
-  });
-}
-
-
-/* =========================
-   SEGUNDO TIEMPO
-========================= */
-
-function startSecondHalf() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-
-  stopLocalTimer();
-
-
-  if (gameMode === "futsal") {
-
-    seconds =
-      20 * 60;
-
-  } else {
-
-    seconds =
-      45 * 60;
-  }
-
-
-  currentPeriod =
-    "2T";
-
-  addedTime =
-    null;
-
-
-  homeFouls =
-    0;
-
-  awayFouls =
-    0;
-
-  running =
-    true;
-
-  clockStartedAt =
-    Date.now();
-
-
-  updateScreen();
-
-  startLocalTimer();
-
-
-  matchRef.update({
-
-    seconds:
-      seconds,
-
-    period:
-      "2T",
-
-    addedTime:
-      null,
-
-    homeFouls:
-      0,
-
-    awayFouls:
-      0,
-
-    running:
-      true,
-
-    clockStartedAt:
-      firebase.database.ServerValue.TIMESTAMP
-
-  });
-}
-
-
-/* =========================
-   FINAL
-========================= */
-
-function finishMatch() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-
-  if (running) {
-
-    seconds =
-      getCurrentSeconds();
-  }
-
-
-  running = false;
-
-  clockStartedAt = null;
-
-  stopLocalTimer();
-
-  currentPeriod =
-    "FINAL";
-
-
-  updateScreen();
-
-
-  matchRef.update({
-
-    seconds:
-      seconds,
-
-    running:
-      false,
-
-    clockStartedAt:
-      null,
-
-    period:
-      "FINAL"
-
-  });
-}
-
-
-/* =========================
-   ADICIONAL
-========================= */
-
-function showAddedTime(minutes) {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-
-  addedTime =
-    minutes;
-
-
-  matchRef.update({
-
-    addedTime:
-      minutes
-
-  });
-}
-
-
-function hideAddedTime() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-
-  addedTime =
-    null;
-
-
-  matchRef.update({
-
-    addedTime:
-      null
-
-  });
-}
-
-
-/* =========================
-   REINICIAR
-========================= */
-
-function resetMatch() {
-
-  if (loadingFirebase) {
-    return;
-  }
-
-
-  stopLocalTimer();
-
-
-  home = 0;
-  away = 0;
-
-  homeFouls = 0;
-  awayFouls = 0;
-
-  firstLegHomeScore = 0;
-  firstLegAwayScore = 0;
-  showFirstLeg = false;
-
-  penaltyHomeResults = [];
-  penaltyAwayResults = [];
-  showPenalties = false;
-
-
-  if (gameMode === "futsal") {
-
-    seconds =
-      20 * 60;
-
-  } else {
-
-    seconds =
-      0;
-  }
-
-
-  running = false;
-
-  currentPeriod =
-    "1T";
-
-  addedTime =
-    null;
-
-  clockStartedAt =
-    null;
-
-
-  updateScreen();
-
-
-  matchRef.update({
-
-    homeScore:
-      0,
-
-    awayScore:
-      0,
-
-    homeFouls:
-      0,
-
-    awayFouls:
-      0,
-
-    firstLegHomeScore:
-      0,
-
-    firstLegAwayScore:
-      0,
-
-    showFirstLeg:
-      false,
-
-    penaltyHomeResults:
-      [],
-
-    penaltyAwayResults:
-      [],
-
-    showPenalties:
-      false,
-
-    seconds:
-      seconds,
-
-    running:
-      false,
-
-    period:
-      "1T",
-
-    addedTime:
-      null,
-
-    clockStartedAt:
-      null,
-
-    gameMode:
-      gameMode
-
-  });
-}
-  /* =========================
-   FIREBASE
-========================= */
-console.log("Firebase cargado correctamente");
-
-auth.signInAnonymously()
-
-  .then(function() {
-
-    loadTeams();
-
-    console.log("AUTENTICACIÓN FIREBASE OK");
-
-    partidoElement.textContent =
-      "Partido " + partidoNumero;
-
-
-    matchRef.on(
-      "value",
-      function(snapshot) {
-
-        const data =
-          snapshot.val();
-
-
-        if (!data) {
-
-          loadingFirebase =
-            false;
-
-          updateScreen();
-
-          return;
-        }
-
-
-        home =
-          data.homeScore ?? 0;
-
-        away =
-          data.awayScore ?? 0;
-
-        homeFouls =
-          data.homeFouls ?? 0;
-
-        awayFouls =
-          data.awayFouls ?? 0;
-
-        firstLegHomeScore =
-          data.firstLegHomeScore ?? 0;
-
-        firstLegAwayScore =
-          data.firstLegAwayScore ?? 0;
-
-        showFirstLeg =
-          data.showFirstLeg ?? false;
-
-        penaltyHomeResults =
-          Array.isArray(data.penaltyHomeResults)
-            ? data.penaltyHomeResults
-            : [];
-
-        penaltyAwayResults =
-          Array.isArray(data.penaltyAwayResults)
-            ? data.penaltyAwayResults
-            : [];
-
-        showPenalties =
-          data.showPenalties ?? false;
-
-        seconds =
-          data.seconds ?? 0;
-
-        running =
-          data.running ?? false;
-
-        currentPeriod =
-          data.period ?? "1T";
-
-        addedTime =
-          data.addedTime ?? null;
-
-        gameMode =
-          data.gameMode ?? "futbol";
-
-        clockStartedAt =
-          data.clockStartedAt ?? null;
-
-
-        if (data.homeName) {
-
-          homeNameElement.textContent =
-            data.homeName;
-        }
-
-
-        if (data.awayName) {
-
-          awayNameElement.textContent =
-            data.awayName;
-        }
-
-
-        modeDisplay.textContent =
-          gameMode === "futsal"
-            ? "Futsal"
-            : "Fútbol";
-
-
-        updateScreen();
-
-
-        loadingFirebase =
-          false;
-
-
-        if (running) {
-
-          startLocalTimer();
-
-        } else {
-
-          stopLocalTimer();
-
-        }
-
-      }
-    );
-
-  })
-
-.catch(function(error) {
-
-  console.error("ERROR FIREBASE:", error);
-
-  estadoElement.textContent =
-    "Firebase: " + error.code;
-
-});
-
-
-
-/* =========================
-   INICIO
-========================= */
-
-updateScreen();
-
-
-window.setMode =
-  setMode;
-
-window.homeGoal =
-  homeGoal;
-
-window.awayGoal =
-  awayGoal;
-
-window.homeGoalDown =
-  homeGoalDown;
-
-window.awayGoalDown =
-  awayGoalDown;
-
-window.homeFoulUp =
-  homeFoulUp;
-
-window.homeFoulDown =
-  homeFoulDown;
-
-window.awayFoulUp =
-  awayFoulUp;
-
-window.awayFoulDown =
-  awayFoulDown;
-
-window.firstLegHomeUp =
-  firstLegHomeUp;
-
-window.firstLegHomeDown =
-  firstLegHomeDown;
-
-window.firstLegAwayUp =
-  firstLegAwayUp;
-
-window.firstLegAwayDown =
-  firstLegAwayDown;
-
-window.toggleFirstLeg =
-  toggleFirstLeg;
-
-window.togglePenalties =
-  togglePenalties;
-
-window.penaltyHomeGoal =
-  penaltyHomeGoal;
-
-window.penaltyHomeMiss =
-  penaltyHomeMiss;
-
-window.penaltyHomeCorrect =
-  penaltyHomeCorrect;
-
-window.penaltyAwayGoal =
-  penaltyAwayGoal;
-
-window.penaltyAwayMiss =
-  penaltyAwayMiss;
-
-window.penaltyAwayCorrect =
-  penaltyAwayCorrect;
-
-window.startClock =
-  startClock;
-
-window.pauseClock =
-  pauseClock;
-
-window.finishFirstHalf =
-  finishFirstHalf;
-
-window.startSecondHalf =
-  startSecondHalf;
-
-window.finishMatch =
-  finishMatch;
-
-window.showAddedTime =
-  showAddedTime;
-
-window.hideAddedTime =
-  hideAddedTime;
-
-window.resetMatch =
-  resetMatch;
-
-window.saveTeam = saveTeam;
-window.assignHomeTeam = assignHomeTeam;
-window.assignAwayTeam = assignAwayTeam;
-window.editTeam = editTeam;
-window.deleteTeam = deleteTeam;
-
-</script>
-
-</body>
-</html>
