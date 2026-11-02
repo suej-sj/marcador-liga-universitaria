@@ -364,9 +364,9 @@ button:active {
 .goal-animation {
   --goal-primary: #222222;
   --goal-secondary: #555555;
-  position: fixed;
+  position: absolute;
   inset: 0;
-  z-index: 99999;
+  z-index: 20;
   display: none;
   align-items: center;
   justify-content: center;
@@ -425,9 +425,9 @@ button:active {
 }
 
 .goal-team-name {
-  max-width: 90vw;
+  max-width: 92%;
   color: #fff;
-  font-size: clamp(20px, 4vw, 52px);
+  font-size: clamp(14px, 3.5vw, 42px);
   line-height: 1.05;
   font-weight: 900;
   letter-spacing: 0.10em;
@@ -437,8 +437,8 @@ button:active {
 }
 
 .goal-crest-stage {
-  width: min(54vmin, 620px);
-  height: min(54vmin, 620px);
+  width: min(42%, 300px);
+  height: min(70%, 300px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -458,14 +458,14 @@ button:active {
 .goal-crest-fallback {
   display: none;
   color: #fff;
-  font-size: min(38vmin, 420px);
+  font-size: min(24vw, 180px);
   line-height: 1;
   filter: drop-shadow(0 12px 28px rgba(0,0,0,0.48));
 }
 
 .goal-word {
   color: #fff;
-  font-size: clamp(58px, 13vw, 190px);
+  font-size: clamp(32px, 9vw, 110px);
   line-height: 0.9;
   font-weight: 1000;
   font-style: italic;
@@ -616,10 +616,6 @@ button:active {
     Conectando con Firebase...
   </div>
 
-</div>
-
-
-
 <div id="goalAnimation" class="goal-animation" aria-hidden="true">
   <div class="goal-animation-content">
     <div id="goalTeamName" class="goal-team-name"></div>
@@ -630,6 +626,12 @@ button:active {
     <div class="goal-word">¡GOOOL!</div>
   </div>
 </div>
+
+</div>
+
+
+
+
 
 <!-- FIREBASE -->
 
