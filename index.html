@@ -355,6 +355,166 @@ button:active {
   font-size: 10px;
 }
 }
+
+
+/* =========================
+   ANIMACIÓN DE GOL
+========================= */
+
+.goal-animation {
+  --goal-primary: #222222;
+  --goal-secondary: #555555;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  isolation: isolate;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    var(--goal-primary) 0%,
+    var(--goal-primary) 48%,
+    var(--goal-secondary) 48%,
+    var(--goal-secondary) 100%
+  );
+}
+
+.goal-animation.active {
+  display: flex;
+  animation: goalScreen 3.2s ease both;
+}
+
+.goal-animation::before {
+  content: "";
+  position: absolute;
+  inset: -35%;
+  z-index: 0;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255,255,255,0.20) 0deg 7deg,
+    transparent 7deg 14deg
+  );
+  animation: goalRays 8s linear infinite;
+}
+
+.goal-animation::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at center, transparent 0 20%, rgba(0,0,0,0.20) 75%),
+    linear-gradient(180deg, rgba(0,0,0,0.12), transparent 35%, rgba(0,0,0,0.30));
+  z-index: 0;
+}
+
+.goal-animation-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3vh 3vw;
+  position: relative;
+}
+
+.goal-team-name {
+  max-width: 90vw;
+  color: #fff;
+  font-size: clamp(20px, 4vw, 52px);
+  line-height: 1.05;
+  font-weight: 900;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  text-shadow: 0 4px 18px rgba(0,0,0,0.55);
+  animation: goalTeamName 3.2s ease both;
+}
+
+.goal-crest-stage {
+  width: min(54vmin, 620px);
+  height: min(54vmin, 620px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: -1vh 0;
+  overflow: visible;
+  animation: goalCrestZoom 3.2s cubic-bezier(.15,.75,.2,1) both;
+}
+
+.goal-crest-stage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 28px rgba(0,0,0,0.48));
+}
+
+.goal-crest-fallback {
+  display: none;
+  color: #fff;
+  font-size: min(38vmin, 420px);
+  line-height: 1;
+  filter: drop-shadow(0 12px 28px rgba(0,0,0,0.48));
+}
+
+.goal-word {
+  color: #fff;
+  font-size: clamp(58px, 13vw, 190px);
+  line-height: 0.9;
+  font-weight: 1000;
+  font-style: italic;
+  letter-spacing: -0.055em;
+  -webkit-text-stroke: 2px rgba(0,0,0,0.22);
+  text-shadow:
+    0 7px 0 rgba(0,0,0,0.20),
+    0 12px 35px rgba(0,0,0,0.45);
+  animation: goalWordPop 3.2s cubic-bezier(.16,.8,.25,1) both;
+}
+
+@keyframes goalScreen {
+  0% { opacity: 0; }
+  8% { opacity: 1; }
+  78% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes goalRays {
+  from { transform: rotate(0deg) scale(1); }
+  to { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes goalTeamName {
+  0%, 5% { opacity: 0; transform: translateY(-35px); }
+  16%, 78% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-15px); }
+}
+
+@keyframes goalCrestZoom {
+  0% { opacity: 0; transform: scale(0.12) rotate(-16deg); }
+  18% { opacity: 1; transform: scale(1.18) rotate(5deg); }
+  34%, 78% { opacity: 1; transform: scale(1.02) rotate(0deg); }
+  100% { opacity: 0; transform: scale(1.45) rotate(4deg); }
+}
+
+@keyframes goalWordPop {
+  0%, 20% { opacity: 0; transform: scale(0.35) translateY(45px); }
+  38% { opacity: 1; transform: scale(1.12) translateY(0); }
+  48%, 78% { opacity: 1; transform: scale(1) translateY(0); }
+  100% { opacity: 0; transform: scale(1.18) translateY(-12px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .goal-animation::before {
+    animation: none;
+  }
+}
+
 </style>
 </head>
 
@@ -458,6 +618,18 @@ button:active {
 
 </div>
 
+
+
+<div id="goalAnimation" class="goal-animation" aria-hidden="true">
+  <div class="goal-animation-content">
+    <div id="goalTeamName" class="goal-team-name"></div>
+    <div class="goal-crest-stage">
+      <img id="goalCrestImage" alt="Escudo del equipo que convirtió">
+      <div id="goalCrestFallback" class="goal-crest-fallback">⚽</div>
+    </div>
+    <div class="goal-word">¡GOOOL!</div>
+  </div>
+</div>
 
 <!-- FIREBASE -->
 
@@ -594,6 +766,54 @@ const homeCrestElement =
 
 const awayCrestElement =
   document.getElementById("awayCrest");
+
+const goalAnimationElement =
+  document.getElementById("goalAnimation");
+
+const goalTeamNameElement =
+  document.getElementById("goalTeamName");
+
+const goalCrestImageElement =
+  document.getElementById("goalCrestImage");
+
+const goalCrestFallbackElement =
+  document.getElementById("goalCrestFallback");
+
+let scoreSnapshotInitialized = false;
+let goalAnimationTimeout = null;
+
+function showGoalAnimation(team, teamName, primaryColor, secondaryColor, crestUrl) {
+  const safePrimary = primaryColor || "#222222";
+  const safeSecondary = secondaryColor || "#555555";
+
+  goalAnimationElement.style.setProperty("--goal-primary", safePrimary);
+  goalAnimationElement.style.setProperty("--goal-secondary", safeSecondary);
+
+  goalTeamNameElement.textContent = teamName || (team === "home" ? "EQUIPO LOCAL" : "EQUIPO VISITANTE");
+
+  if (crestUrl) {
+    goalCrestImageElement.src = crestUrl;
+    goalCrestImageElement.style.display = "block";
+    goalCrestFallbackElement.style.display = "none";
+  } else {
+    goalCrestImageElement.removeAttribute("src");
+    goalCrestImageElement.style.display = "none";
+    goalCrestFallbackElement.style.display = "block";
+  }
+
+  if (goalAnimationTimeout !== null) {
+    clearTimeout(goalAnimationTimeout);
+  }
+
+  goalAnimationElement.classList.remove("active");
+  void goalAnimationElement.offsetWidth;
+  goalAnimationElement.classList.add("active");
+
+  goalAnimationTimeout = setTimeout(function() {
+    goalAnimationElement.classList.remove("active");
+    goalAnimationTimeout = null;
+  }, 3300);
+}
 
 
 /* =========================
@@ -1379,11 +1599,42 @@ auth.signInAnonymously()
         }
 
 
-        home =
-          data.homeScore ?? 0;
+        const incomingHomeScore = data.homeScore ?? 0;
+        const incomingAwayScore = data.awayScore ?? 0;
 
-        away =
-          data.awayScore ?? 0;
+        // La primera lectura de Firebase solo sincroniza el marcador.
+        // Las animaciones se disparan únicamente ante un aumento posterior.
+        if (scoreSnapshotInitialized) {
+          if (incomingHomeScore > home) {
+            const homeCrestUrl =
+              data.homeCrest ||
+              (homeCrestElement.querySelector("img") && homeCrestElement.querySelector("img").src);
+
+            showGoalAnimation(
+              "home",
+              data.homeName || homeNameElement.textContent,
+              data.homePrimaryColor,
+              data.homeSecondaryColor,
+              homeCrestUrl
+            );
+          } else if (incomingAwayScore > away) {
+            const awayCrestUrl =
+              data.awayCrest ||
+              (awayCrestElement.querySelector("img") && awayCrestElement.querySelector("img").src);
+
+            showGoalAnimation(
+              "away",
+              data.awayName || awayNameElement.textContent,
+              data.awayPrimaryColor,
+              data.awaySecondaryColor,
+              awayCrestUrl
+            );
+          }
+        }
+
+        home = incomingHomeScore;
+        away = incomingAwayScore;
+        scoreSnapshotInitialized = true;
 
         homeFouls =
           data.homeFouls ?? 0;
