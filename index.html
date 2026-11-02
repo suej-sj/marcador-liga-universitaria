@@ -527,12 +527,75 @@ button:active {
   }
 }
 
+
+/* =========================
+   PRESENTACIÓN Y ZÓCALO
+========================= */
+.broadcast-stack {
+  position: absolute;
+  z-index: 30;
+  top: 36vh;
+  right: 4vw;
+  width: min(46vw, 650px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  pointer-events: none;
+}
+.presentation-card, .announcement-bar {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(28px);
+  transition: opacity .35s ease, transform .35s ease, visibility .35s;
+  pointer-events: none;
+}
+.presentation-card {
+  width: 100%;
+  padding: 16px 18px 10px;
+  border-radius: 13px;
+  color: #fff;
+  background: linear-gradient(145deg, rgba(24,24,29,.97), rgba(5,5,8,.96));
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow: 0 8px 28px rgba(0,0,0,.38);
+  text-align: center;
+}
+.presentation-card.active, .announcement-bar.active {
+  opacity: 1; visibility: visible; transform: translateX(0);
+}
+#scoreboard.presentation-hidden {
+  opacity: 0; visibility: hidden; transform: translateY(-8px);
+  transition: opacity .3s ease, transform .3s ease, visibility .3s;
+}
+.scoreboard { transition: opacity .3s ease, transform .3s ease, visibility .3s; }
+.presentation-title { font-size: clamp(14px, 1.35vw, 20px); font-weight: 900; letter-spacing: 1.1px; line-height: 1.15; }
+.presentation-subtitle { margin-top: 5px; font-size: clamp(10px, .9vw, 13px); font-weight: 700; color: rgba(255,255,255,.76); letter-spacing: .45px; }
+.presentation-teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin-top: 14px; }
+.presentation-team { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.presentation-crest { width: clamp(62px, 6.2vw, 88px); height: clamp(62px, 6.2vw, 88px); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 12px; background: rgba(255,255,255,.12); }
+.presentation-crest img { width: 100%; height: 100%; object-fit: contain; }
+.presentation-team-name { font-size: clamp(11px, 1vw, 15px); font-weight: 900; line-height: 1.1; overflow-wrap: anywhere; }
+.presentation-result { min-width: 100px; text-align: center; }
+.presentation-score { font-size: clamp(28px, 3vw, 42px); font-weight: 1000; line-height: 1; white-space: nowrap; }
+.presentation-first-leg { margin-top: 5px; font-size: 11px; color: rgba(255,255,255,.72); }
+.presentation-phase { margin-top: 5px; font-size: 12px; font-weight: 900; letter-spacing: 1px; }
+.presentation-brand { display: block; width: min(165px, 34%); max-height: 52px; object-fit: contain; margin: 12px auto 0; }
+.announcement-bar { width: 100%; min-height: 82px; padding: 10px 14px; display: grid; grid-template-columns: 62px minmax(0,1fr) 58px; align-items: center; gap: 12px; border-radius: 12px; color: #fff; background: var(--announcement-color, #242424); box-shadow: 0 7px 24px rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.25); }
+.announcement-crest, .announcement-brand { width: 58px; height: 58px; border-radius: 50%; object-fit: contain; display: flex; align-items: center; justify-content: center; overflow: hidden; background: rgba(255,255,255,.14); }
+.announcement-crest img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+.announcement-text { text-align: center; font-size: clamp(13px, 1.35vw, 19px); font-weight: 900; line-height: 1.15; overflow-wrap: anywhere; }
+@media (max-width: 900px) {
+  .broadcast-stack { width: min(58vw, 540px); right: 3vw; top: 34vh; }
+  .announcement-bar { grid-template-columns: 48px minmax(0,1fr) 46px; min-height: 66px; padding: 8px 10px; gap: 8px; }
+  .announcement-crest, .announcement-brand { width: 44px; height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) { .presentation-card, .announcement-bar, #scoreboard { transition: none; } }
+
 </style>
 </head>
 
 <body>
 
-<div class="scoreboard">
+<div class="scoreboard" id="scoreboard">
 
   <div id="league" class="league">LIGA UNIVERSITARIA</div>
 
@@ -641,8 +704,36 @@ button:active {
 
 </div>
 
+<div id="broadcastStack" class="broadcast-stack">
+  <section id="presentationCard" class="presentation-card" aria-hidden="true">
+    <div class="presentation-heading">
+      <div id="presentationTitleDisplay" class="presentation-title"></div>
+      <div id="presentationSubtitleDisplay" class="presentation-subtitle"></div>
+    </div>
+    <div class="presentation-teams">
+      <div class="presentation-team">
+        <div id="presentationHomeCrest" class="presentation-crest"></div>
+        <div id="presentationHomeName" class="presentation-team-name"></div>
+      </div>
+      <div class="presentation-result">
+        <div id="presentationScore" class="presentation-score">0 - 0</div>
+        <div id="presentationFirstLeg" class="presentation-first-leg"></div>
+        <div id="presentationPhase" class="presentation-phase">1T</div>
+      </div>
+      <div class="presentation-team">
+        <div id="presentationAwayCrest" class="presentation-crest"></div>
+        <div id="presentationAwayName" class="presentation-team-name"></div>
+      </div>
+    </div>
+    <img class="presentation-brand" src="assets/suenos-en-juego.png" alt="Sueños en Juego">
+  </section>
 
-
+  <section id="announcementBar" class="announcement-bar" aria-hidden="true">
+    <div id="announcementCrest" class="announcement-crest"></div>
+    <div id="announcementTextDisplay" class="announcement-text"></div>
+    <img class="announcement-brand" src="assets/logo-suej-circular.png" alt="Sueños en Juego" onerror="this.style.visibility='hidden'">
+  </section>
+</div>
 
 
 <!-- FIREBASE -->
@@ -712,6 +803,13 @@ let clockStartedAt = null;
 let timer = null;
 
 let loadingFirebase = true;
+let presentationVisible = false;
+let announcementVisible = false;
+let presentationTitle = "";
+let presentationSubtitle = "";
+let announcementText = "";
+let announcementTeamCrest = "";
+let announcementTeamColor = "#222222";
 
 
 /* =========================
@@ -792,6 +890,21 @@ const goalCrestImageElement =
 
 const goalCrestFallbackElement =
   document.getElementById("goalCrestFallback");
+
+const scoreboardElement = document.getElementById("scoreboard");
+const presentationCardElement = document.getElementById("presentationCard");
+const announcementBarElement = document.getElementById("announcementBar");
+const presentationTitleDisplay = document.getElementById("presentationTitleDisplay");
+const presentationSubtitleDisplay = document.getElementById("presentationSubtitleDisplay");
+const presentationHomeCrest = document.getElementById("presentationHomeCrest");
+const presentationAwayCrest = document.getElementById("presentationAwayCrest");
+const presentationHomeName = document.getElementById("presentationHomeName");
+const presentationAwayName = document.getElementById("presentationAwayName");
+const presentationScore = document.getElementById("presentationScore");
+const presentationFirstLeg = document.getElementById("presentationFirstLeg");
+const presentationPhase = document.getElementById("presentationPhase");
+const announcementCrest = document.getElementById("announcementCrest");
+const announcementTextDisplay = document.getElementById("announcementTextDisplay");
 
 let scoreSnapshotInitialized = false;
 let goalAnimationTimeout = null;
@@ -922,6 +1035,41 @@ function resultsToText(results) {
   return results.map(penaltySymbol).join(" ");
 }
   
+  function setPresentationCrest(element, url, color) {
+    const crestBackground = /^#[0-9a-f]{6}$/i.test(color || "") ? color + "88" : (color || "rgba(255,255,255,.12)");
+    element.style.backgroundColor = crestBackground;
+    element.innerHTML = "";
+    if (url) {
+      const image = document.createElement("img");
+      image.src = url; image.alt = "Escudo";
+      element.appendChild(image);
+    }
+  }
+
+  function updateBroadcastGraphics(data) {
+    presentationTitleDisplay.textContent = presentationTitle || "";
+    presentationSubtitleDisplay.textContent = presentationSubtitle || "";
+    presentationHomeName.textContent = homeNameElement.textContent || "LOCAL";
+    presentationAwayName.textContent = awayNameElement.textContent || "VISITANTE";
+    setPresentationCrest(presentationHomeCrest, data.homeCrest || "", data.homePrimaryColor);
+    setPresentationCrest(presentationAwayCrest, data.awayCrest || "", data.awayPrimaryColor);
+    presentationScore.textContent = home + " - " + away;
+    presentationFirstLeg.textContent = data.showFirstLeg ? "IDA: " + (data.firstLegHomeScore ?? 0) + " - " + (data.firstLegAwayScore ?? 0) : "";
+    presentationFirstLeg.style.display = data.showFirstLeg ? "block" : "none";
+    presentationPhase.textContent = currentPeriod === "ENTRETIEMPO" ? "ENTRETIEMPO" : currentPeriod === "FINAL" ? "FINAL" : currentPeriod;
+    scoreboardElement.classList.toggle("presentation-hidden", presentationVisible);
+    presentationCardElement.classList.toggle("active", presentationVisible);
+    presentationCardElement.setAttribute("aria-hidden", String(!presentationVisible));
+    announcementTextDisplay.textContent = announcementText || "";
+    announcementCrest.innerHTML = "";
+    if (announcementTeamCrest) {
+      const image = document.createElement("img"); image.src = announcementTeamCrest; image.alt = "Escudo del anuncio"; announcementCrest.appendChild(image);
+    }
+    announcementBarElement.style.setProperty("--announcement-color", announcementTeamColor || "#222222");
+    announcementBarElement.classList.toggle("active", announcementVisible);
+    announcementBarElement.setAttribute("aria-hidden", String(!announcementVisible));
+  }
+
   function updateScreen() {
 
     leagueElement.textContent =
@@ -1054,6 +1202,9 @@ if (showPenalties) {
     addedTimeElement.textContent = "";
   }
 }
+
+
+  updateBroadcastGraphics(window.currentMatchData || {});
 }
 
 
@@ -1645,6 +1796,15 @@ auth.signInAnonymously()
             );
           }
         }
+
+        window.currentMatchData = data;
+        presentationVisible = data.presentationVisible === true;
+        announcementVisible = data.announcementVisible === true;
+        presentationTitle = data.presentationTitle || "";
+        presentationSubtitle = data.presentationSubtitle || "";
+        announcementText = data.announcementText || "";
+        announcementTeamCrest = data.announcementTeamCrest || "";
+        announcementTeamColor = data.announcementTeamColor || "#222222";
 
         home = incomingHomeScore;
         away = incomingAwayScore;
