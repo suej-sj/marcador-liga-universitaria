@@ -1866,6 +1866,25 @@ auth.signInAnonymously()
           }
         }
 
+        // Detectar un reinicio realizado desde el panel de control.
+        // El panel puede reiniciar el partido sin enviar nextMatchLabel;
+        // por eso reconocemos la transición hacia 0-0, reloj detenido y 1T.
+        const previousMatchData = window.currentMatchData || null;
+        const resetDetectedFromControl = !!(
+          previousMatchData &&
+          !((data.running ?? false)) &&
+          (data.period ?? "1T") === "1T" &&
+          (data.seconds ?? 0) === 0 &&
+          (data.homeScore ?? 0) === 0 &&
+          (data.awayScore ?? 0) === 0 &&
+          (
+            (previousMatchData.period ?? "1T") !== "1T" ||
+            (previousMatchData.seconds ?? 0) > 0 ||
+            (previousMatchData.homeScore ?? 0) > 0 ||
+            (previousMatchData.awayScore ?? 0) > 0 ||
+            previousMatchData.running === true
+          )
+        );
         window.currentMatchData = data;
         presentationVisible = data.presentationVisible === true;
         announcementVisible = data.announcementVisible === true;
@@ -1907,7 +1926,9 @@ penaltyAwayResults =
 showPenalties =
   data.showPenalties ?? false;
 
-nextMatchLabel = data.nextMatchLabel ?? false;
+nextMatchLabel = data.running
+  ? false
+  : (data.nextMatchLabel === true || resetDetectedFromControl || nextMatchLabel);
 
         seconds =
           data.seconds ?? 0;
