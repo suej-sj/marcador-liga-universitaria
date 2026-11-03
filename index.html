@@ -578,6 +578,9 @@ button:active {
 .presentation-team-name { font-size: clamp(21px, 1.8vw, 28px); font-weight: 900; line-height: 1.12; overflow-wrap: anywhere; }
 .presentation-result { min-width: 185px; text-align: center; }
 .presentation-score { font-size: clamp(60px, 5.3vw, 78px); font-weight: 1000; line-height: 1; white-space: nowrap; }
+.presentation-penalty-score { margin-top: 5px; color: #fff; text-align: center; }
+.presentation-penalty-numbers { font-size: clamp(60px, 5.3vw, 78px); font-weight: 1000; line-height: 1; white-space: nowrap; }
+.presentation-penalty-label { margin-top: 5px; font-size: clamp(15px, 1.25vw, 19px); font-weight: 900; letter-spacing: 1.3px; color: rgba(255,255,255,.86); line-height: 1.1; }
 .presentation-first-leg { margin-top: 10px; font-size: 19px; color: rgba(255,255,255,.78); }
 .presentation-phase { margin-top: 10px; font-size: 21px; font-weight: 900; letter-spacing: 1.3px; }
 .presentation-brand { display: block; width: min(315px, 48%); max-height: 100px; object-fit: contain; margin: 22px auto 0; }
@@ -767,6 +770,7 @@ button:active {
       </div>
       <div class="presentation-result">
         <div id="presentationScore" class="presentation-score">0 - 0</div>
+        <div id="presentationPenaltyScore" class="presentation-penalty-score" style="display:none"></div>
         <div id="presentationFirstLeg" class="presentation-first-leg"></div>
         <div id="presentationPhase" class="presentation-phase">1T</div>
       </div>
@@ -837,6 +841,7 @@ let showFirstLeg = false;
   let penaltyHomeResults = [];
 let penaltyAwayResults = [];
 let showPenalties = false;
+let nextMatchLabel = false;
 
 let seconds = 0;
 
@@ -951,6 +956,7 @@ const presentationAwayCrest = document.getElementById("presentationAwayCrest");
 const presentationHomeName = document.getElementById("presentationHomeName");
 const presentationAwayName = document.getElementById("presentationAwayName");
 const presentationScore = document.getElementById("presentationScore");
+const presentationPenaltyScore = document.getElementById("presentationPenaltyScore");
 const presentationFirstLeg = document.getElementById("presentationFirstLeg");
 const presentationPhase = document.getElementById("presentationPhase");
 const announcementCrest = document.getElementById("announcementCrest");
@@ -1104,9 +1110,14 @@ function resultsToText(results) {
     setPresentationCrest(presentationHomeCrest, data.homeCrest || "", data.homePrimaryColor);
     setPresentationCrest(presentationAwayCrest, data.awayCrest || "", data.awayPrimaryColor);
     presentationScore.textContent = home + " - " + away;
+    const penaltyHome = countPenaltyGoals(penaltyHomeResults);
+    const penaltyAway = countPenaltyGoals(penaltyAwayResults);
+    const hasPenaltyResult = showPenalties && (penaltyHomeResults.length > 0 || penaltyAwayResults.length > 0);
+    presentationPenaltyScore.innerHTML = hasPenaltyResult ? `<div class="presentation-penalty-numbers">${penaltyHome} - ${penaltyAway}</div><div class="presentation-penalty-label">PENALES</div>` : "";
+    presentationPenaltyScore.style.display = hasPenaltyResult ? "block" : "none";
     presentationFirstLeg.textContent = data.showFirstLeg ? "IDA: " + (data.firstLegHomeScore ?? 0) + " - " + (data.firstLegAwayScore ?? 0) : "";
     presentationFirstLeg.style.display = data.showFirstLeg ? "block" : "none";
-    presentationPhase.textContent = currentPeriod === "ENTRETIEMPO" ? "ENTRETIEMPO" : currentPeriod === "FINAL" ? "FINAL" : currentPeriod;
+    presentationPhase.textContent = nextMatchLabel ? "A CONTINUACIÓN" : (currentPeriod === "ENTRETIEMPO" ? "ENTRETIEMPO" : currentPeriod === "FINAL" ? "FINAL" : currentPeriod);
     scoreboardElement.classList.toggle("presentation-hidden", presentationVisible);
     presentationCardElement.classList.toggle("active", presentationVisible);
     presentationCardElement.setAttribute("aria-hidden", String(!presentationVisible));
@@ -1419,6 +1430,7 @@ function startClock() {
 
 
   running = true;
+  nextMatchLabel = false;
 
   clockStartedAt =
     Date.now();
@@ -1433,6 +1445,9 @@ function startClock() {
 
     running:
       true,
+
+    nextMatchLabel:
+      false,
 
     seconds:
       seconds,
@@ -1736,6 +1751,7 @@ function resetMatch() {
   running = false;
 
   currentPeriod = "1T";
+  nextMatchLabel = true;
 
   addedTime = null;
 
@@ -1764,6 +1780,9 @@ function resetMatch() {
 
     running:
       false,
+
+    nextMatchLabel:
+      true,
 
     period:
       "1T",
@@ -1887,6 +1906,8 @@ penaltyAwayResults =
 
 showPenalties =
   data.showPenalties ?? false;
+
+nextMatchLabel = data.nextMatchLabel ?? false;
 
         seconds =
           data.seconds ?? 0;
