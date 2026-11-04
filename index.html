@@ -522,18 +522,18 @@ button:active {
 .scoreboard { transition: opacity .3s ease, transform .3s ease, visibility .3s; }
 .presentation-title { font-size: clamp(24px, 2.15vw, 33px); font-weight: 900; letter-spacing: 1.5px; line-height: 1.15; }
 .presentation-subtitle { margin-top: 10px; font-size: clamp(18px, 1.5vw, 23px); font-weight: 700; color: rgba(255,255,255,.82); letter-spacing: .6px; }
-.presentation-teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 28px; margin-top: 25px; }
+.presentation-teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: 28px; margin-top: 25px; }
 .presentation-team { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .presentation-crest { width: clamp(120px, 9.5vw, 160px); height: clamp(120px, 9.5vw, 160px); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 16px; background: rgba(255,255,255,.12); }
 .presentation-crest img { width: 100%; height: 100%; object-fit: contain; }
 .presentation-team-name { font-size: clamp(21px, 1.8vw, 28px); font-weight: 900; line-height: 1.12; overflow-wrap: anywhere; }
-.presentation-result { min-width: 185px; text-align: center; }
-.presentation-score { font-size: clamp(60px, 5.3vw, 78px); font-weight: 1000; line-height: 1; white-space: nowrap; }
-.presentation-penalty-score { display: block; height: 110px; min-height: 110px; box-sizing: border-box; overflow: hidden; margin-top: 5px; color: #fff; text-align: center; }
+.presentation-result { min-width: 185px; text-align: center; display: grid; grid-template-rows: calc(clamp(120px, 9.5vw, 160px) + 12px) auto auto auto; align-items: center; justify-items: center; }
+.presentation-score { grid-row: 2; font-size: clamp(60px, 5.3vw, 78px); font-weight: 1000; line-height: 1; white-space: nowrap; }
+.presentation-penalty-score { grid-row: 3; display: none; height: auto; min-height: 0; box-sizing: border-box; overflow: hidden; margin-top: 5px; color: #fff; text-align: center; }
 .presentation-penalty-numbers { font-size: clamp(60px, 5.3vw, 78px); font-weight: 1000; line-height: 1; white-space: nowrap; }
 .presentation-penalty-label { margin-top: 5px; font-size: clamp(15px, 1.25vw, 19px); font-weight: 900; letter-spacing: 1.3px; color: rgba(255,255,255,.86); line-height: 1.1; }
-.presentation-first-leg { margin-top: 10px; font-size: 19px; color: rgba(255,255,255,.78); }
-.presentation-phase { margin-top: 10px; font-size: 21px; font-weight: 900; letter-spacing: 1.3px; }
+.presentation-first-leg { grid-row: 4; margin-top: 10px; font-size: 19px; color: rgba(255,255,255,.78); }
+.presentation-phase { grid-row: 5; margin-top: 10px; font-size: 21px; font-weight: 900; letter-spacing: 1.3px; }
 .presentation-brand { display: block; width: min(315px, 48%); max-height: 100px; object-fit: contain; margin: 22px auto 0; }
 .announcement-bar { width: 100%; min-height: 145px; padding: 20px 26px; display: grid; grid-template-columns: 104px minmax(0,1fr) 98px; align-items: center; gap: 24px; border-radius: 16px; color: #fff; background: var(--announcement-color, #242424); box-shadow: 0 7px 24px rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.25); }
 .announcement-crest, .announcement-brand { width: 94px; height: 94px; border-radius: 50%; object-fit: contain; display: flex; align-items: center; justify-content: center; overflow: hidden; background: rgba(255,255,255,.14); }
@@ -624,6 +624,7 @@ button:active {
   .presentation-title { font-size: clamp(23px, 2.5vw, 31px); }
   .presentation-subtitle { font-size: clamp(17px, 1.8vw, 22px); }
   .presentation-crest { width: clamp(100px, 12vw, 132px); height: clamp(100px, 12vw, 132px); }
+  .presentation-result { grid-template-rows: calc(clamp(100px, 12vw, 132px) + 12px) auto auto auto; }
   .presentation-team-name { font-size: clamp(19px, 2.2vw, 25px); }
   .presentation-result { min-width: 165px; }
   .presentation-score { font-size: clamp(52px, 5.5vw, 68px); }
@@ -1178,7 +1179,7 @@ function resultsToText(results) {
     const penaltyAway = countPenaltyGoals(penaltyAwayResults);
     const hasPenaltyResult = showPenalties && (penaltyHomeResults.length > 0 || penaltyAwayResults.length > 0);
     presentationPenaltyScore.innerHTML = hasPenaltyResult ? `<div class="presentation-penalty-numbers">${penaltyHome} - ${penaltyAway}</div><div class="presentation-penalty-label">PENALES</div>` : "";
-    presentationPenaltyScore.style.display = "block";
+    presentationPenaltyScore.style.display = hasPenaltyResult ? "block" : "none";
     presentationFirstLeg.textContent = data.showFirstLeg ? "IDA: " + (data.firstLegHomeScore ?? 0) + " - " + (data.firstLegAwayScore ?? 0) : "";
     presentationFirstLeg.style.display = data.showFirstLeg ? "block" : "none";
     presentationPhase.textContent = nextMatchLabel ? "A CONTINUACIÓN" : (currentPeriod === "ENTRETIEMPO" ? "ENTRETIEMPO" : currentPeriod === "FINAL" ? "FINAL" : currentPeriod);
