@@ -193,57 +193,8 @@ border-bottom: 1px solid #286C96;
   margin-top: 0;
 }
 
-  .penalties {
-  display: none;
-  width: 100%;
-  min-height: 48px;
-  padding: 7px 20px;
-  background: #111;
-  border-top: 1px solid #333;
-  border-bottom: 1px solid #333;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 15px;
-}
-
-.penalty-team {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.home-penalty {
-  justify-content: flex-end;
-  text-align: right;
-}
-
-.away-penalty {
-  justify-content: flex-start;
-  text-align: left;
-}
-
-.penalty-score {
-  font-size: 22px;
-  font-weight: 900;
-  min-width: 22px;
-}
-
-.penalty-results {
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 2px;
-  white-space: nowrap;
-}
-
-.penalty-center {
-  text-align: center;
-}
-
-.penalty-title {
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 1.5px;
-}
+  /* El registro antiguo queda oculto: los penales se muestran en la franja de transmisión. */
+  .penalties { display: none !important; }
 
 .halftime {
   display: none;
@@ -589,6 +540,50 @@ button:active {
 .announcement-crest img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
 .announcement-text { text-align: center; font-size: clamp(24px, 2.2vw, 33px); font-weight: 900; line-height: 1.16; overflow-wrap: anywhere; }
 
+/* Marcador horizontal de penales: debajo del zócalo de anuncios */
+.penalty-broadcast {
+  display: none;
+  width: 100%;
+  min-height: 154px;
+  grid-template-columns: minmax(0,1fr) minmax(170px, .42fr) minmax(0,1fr);
+  align-items: stretch;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.3);
+  box-shadow: 0 7px 24px rgba(0,0,0,.38);
+  color: #fff;
+}
+.penalty-broadcast.active { display: grid; }
+.penalty-broadcast-team {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: 32px minmax(0,1fr);
+  align-items: center;
+  padding: 10px 14px 12px;
+  background: linear-gradient(135deg, var(--team-primary,#333), var(--team-secondary,#111));
+  text-shadow: 0 2px 4px rgba(0,0,0,.55);
+}
+.penalty-broadcast-team.home { border-right: 1px solid rgba(255,255,255,.18); }
+.penalty-broadcast-team.away { border-left: 1px solid rgba(255,255,255,.18); }
+.penalty-broadcast-name { text-align: center; font-size: clamp(15px,1.35vw,21px); font-weight: 900; letter-spacing: .8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.penalty-broadcast-content { display: flex; align-items: center; justify-content: space-around; gap: 10px; min-width: 0; }
+.penalty-broadcast-crest { width: clamp(48px,5vw,70px); height: clamp(48px,5vw,70px); flex: 0 0 auto; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0,0,0,.45)); }
+.penalty-broadcast-results { display: flex; align-items: center; justify-content: center; gap: clamp(5px,.8vw,12px); min-width: 0; }
+.penalty-broadcast-symbol { font-size: clamp(29px,3.2vw,47px); line-height: 1; font-weight: 1000; text-shadow: 0 2px 5px rgba(0,0,0,.45); }
+.penalty-broadcast-symbol.goal { color: #36e477; }
+.penalty-broadcast-symbol.miss { color: #ff4545; }
+.penalty-broadcast-center { display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(145deg,#24242a,#08080b); padding:10px 8px; }
+.penalty-broadcast-score { font-size: clamp(35px,3.8vw,54px); font-weight:1000; line-height:1; white-space:nowrap; }
+.penalty-broadcast-label { margin-top:8px; font-size:clamp(13px,1.1vw,17px); font-weight:900; letter-spacing:2px; }
+@media (max-width:900px) {
+ .penalty-broadcast { min-height:132px; grid-template-columns:minmax(0,1fr) minmax(130px,.38fr) minmax(0,1fr); }
+ .penalty-broadcast-team { padding:8px 7px; grid-template-rows:27px minmax(0,1fr); }
+ .penalty-broadcast-content { gap:5px; }
+ .penalty-broadcast-crest { width:42px; height:42px; }
+ .penalty-broadcast-results { gap:4px; }
+ .penalty-broadcast-symbol { font-size:clamp(22px,3vw,34px); }
+}
+
 /* Marca SueJ fija en la esquina: alterna ambos logos en bucle, sin activación */
 .permanent-brand-cycle {
   position: fixed;
@@ -787,6 +782,27 @@ button:active {
     <div id="announcementTextDisplay" class="announcement-text"></div>
     <img class="announcement-brand" src="assets/logo-suej-circular.png" alt="Sueños en Juego" onerror="this.style.visibility='hidden'">
   </section>
+
+  <section id="penaltyBroadcast" class="penalty-broadcast" aria-hidden="true">
+    <div id="penaltyBroadcastHome" class="penalty-broadcast-team home">
+      <div id="penaltyBroadcastHomeName" class="penalty-broadcast-name">LOCAL</div>
+      <div class="penalty-broadcast-content">
+        <img id="penaltyBroadcastHomeCrest" class="penalty-broadcast-crest" alt="Escudo local">
+        <div id="penaltyBroadcastHomeResults" class="penalty-broadcast-results"></div>
+      </div>
+    </div>
+    <div class="penalty-broadcast-center">
+      <div id="penaltyBroadcastScore" class="penalty-broadcast-score">0 - 0</div>
+      <div class="penalty-broadcast-label">PENALES</div>
+    </div>
+    <div id="penaltyBroadcastAway" class="penalty-broadcast-team away">
+      <div id="penaltyBroadcastAwayName" class="penalty-broadcast-name">VISITANTE</div>
+      <div class="penalty-broadcast-content">
+        <div id="penaltyBroadcastAwayResults" class="penalty-broadcast-results"></div>
+        <img id="penaltyBroadcastAwayCrest" class="penalty-broadcast-crest" alt="Escudo visitante">
+      </div>
+    </div>
+  </section>
 </div>
 
 
@@ -961,6 +977,16 @@ const presentationFirstLeg = document.getElementById("presentationFirstLeg");
 const presentationPhase = document.getElementById("presentationPhase");
 const announcementCrest = document.getElementById("announcementCrest");
 const announcementTextDisplay = document.getElementById("announcementTextDisplay");
+const penaltyBroadcastElement = document.getElementById("penaltyBroadcast");
+const penaltyBroadcastHomeName = document.getElementById("penaltyBroadcastHomeName");
+const penaltyBroadcastAwayName = document.getElementById("penaltyBroadcastAwayName");
+const penaltyBroadcastHomeCrest = document.getElementById("penaltyBroadcastHomeCrest");
+const penaltyBroadcastAwayCrest = document.getElementById("penaltyBroadcastAwayCrest");
+const penaltyBroadcastHomeResults = document.getElementById("penaltyBroadcastHomeResults");
+const penaltyBroadcastAwayResults = document.getElementById("penaltyBroadcastAwayResults");
+const penaltyBroadcastScore = document.getElementById("penaltyBroadcastScore");
+const penaltyBroadcastHome = document.getElementById("penaltyBroadcastHome");
+const penaltyBroadcastAway = document.getElementById("penaltyBroadcastAway");
 
 let scoreSnapshotInitialized = false;
 let goalAnimationTimeout = null;
@@ -1102,6 +1128,38 @@ function resultsToText(results) {
     }
   }
 
+  function renderPenaltySymbols(container, results) {
+    container.innerHTML = "";
+    (Array.isArray(results) ? results.slice(-5) : []).forEach(function(result) {
+      const symbol = document.createElement("span");
+      symbol.className = "penalty-broadcast-symbol " + (result === "goal" ? "goal" : "miss");
+      symbol.textContent = result === "goal" ? "○" : "×";
+      container.appendChild(symbol);
+    });
+  }
+
+  function updatePenaltyBroadcast(data) {
+    const homePrimary = data.homePrimaryColor || "#333333";
+    const homeSecondary = data.homeSecondaryColor || homePrimary;
+    const awayPrimary = data.awayPrimaryColor || "#333333";
+    const awaySecondary = data.awaySecondaryColor || awayPrimary;
+    penaltyBroadcastHome.style.setProperty("--team-primary", homePrimary);
+    penaltyBroadcastHome.style.setProperty("--team-secondary", homeSecondary);
+    penaltyBroadcastAway.style.setProperty("--team-primary", awayPrimary);
+    penaltyBroadcastAway.style.setProperty("--team-secondary", awaySecondary);
+    penaltyBroadcastHomeName.textContent = homeNameElement.textContent || "LOCAL";
+    penaltyBroadcastAwayName.textContent = awayNameElement.textContent || "VISITANTE";
+    penaltyBroadcastHomeCrest.src = data.homeCrest || "";
+    penaltyBroadcastAwayCrest.src = data.awayCrest || "";
+    penaltyBroadcastHomeCrest.style.visibility = data.homeCrest ? "visible" : "hidden";
+    penaltyBroadcastAwayCrest.style.visibility = data.awayCrest ? "visible" : "hidden";
+    renderPenaltySymbols(penaltyBroadcastHomeResults, penaltyHomeResults);
+    renderPenaltySymbols(penaltyBroadcastAwayResults, penaltyAwayResults);
+    penaltyBroadcastScore.textContent = countPenaltyGoals(penaltyHomeResults) + " - " + countPenaltyGoals(penaltyAwayResults);
+    penaltyBroadcastElement.classList.toggle("active", showPenalties);
+    penaltyBroadcastElement.setAttribute("aria-hidden", String(!showPenalties));
+  }
+
   function updateBroadcastGraphics(data) {
     presentationTitleDisplay.textContent = presentationTitle || "";
     presentationSubtitleDisplay.textContent = presentationSubtitle || "";
@@ -1118,7 +1176,7 @@ function resultsToText(results) {
     presentationFirstLeg.textContent = data.showFirstLeg ? "IDA: " + (data.firstLegHomeScore ?? 0) + " - " + (data.firstLegAwayScore ?? 0) : "";
     presentationFirstLeg.style.display = data.showFirstLeg ? "block" : "none";
     presentationPhase.textContent = nextMatchLabel ? "A CONTINUACIÓN" : (currentPeriod === "ENTRETIEMPO" ? "ENTRETIEMPO" : currentPeriod === "FINAL" ? "FINAL" : currentPeriod);
-    scoreboardElement.classList.toggle("presentation-hidden", presentationVisible);
+    scoreboardElement.classList.toggle("presentation-hidden", presentationVisible || showPenalties);
     presentationCardElement.classList.toggle("active", presentationVisible);
     presentationCardElement.setAttribute("aria-hidden", String(!presentationVisible));
     announcementTextDisplay.textContent = announcementText || "";
@@ -1129,6 +1187,7 @@ function resultsToText(results) {
     announcementBarElement.style.setProperty("--announcement-color", announcementTeamColor || "#222222");
     announcementBarElement.classList.toggle("active", announcementVisible);
     announcementBarElement.setAttribute("aria-hidden", String(!announcementVisible));
+    updatePenaltyBroadcast(data);
   }
 
   function updateScreen() {
