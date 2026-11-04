@@ -529,7 +529,7 @@ button:active {
 .presentation-team-name { font-size: clamp(21px, 1.8vw, 28px); font-weight: 900; line-height: 1.12; overflow-wrap: anywhere; }
 .presentation-result { min-width: 185px; text-align: center; }
 .presentation-score { font-size: clamp(60px, 5.3vw, 78px); font-weight: 1000; line-height: 1; white-space: nowrap; }
-.presentation-penalty-score { margin-top: 5px; color: #fff; text-align: center; }
+.presentation-penalty-score { display: block; min-height: 84px; margin-top: 5px; color: #fff; text-align: center; }
 .presentation-penalty-numbers { font-size: clamp(60px, 5.3vw, 78px); font-weight: 1000; line-height: 1; white-space: nowrap; }
 .presentation-penalty-label { margin-top: 5px; font-size: clamp(15px, 1.25vw, 19px); font-weight: 900; letter-spacing: 1.3px; color: rgba(255,255,255,.86); line-height: 1.1; }
 .presentation-first-leg { margin-top: 10px; font-size: 19px; color: rgba(255,255,255,.78); }
@@ -1178,7 +1178,7 @@ function resultsToText(results) {
     const penaltyAway = countPenaltyGoals(penaltyAwayResults);
     const hasPenaltyResult = showPenalties && (penaltyHomeResults.length > 0 || penaltyAwayResults.length > 0);
     presentationPenaltyScore.innerHTML = hasPenaltyResult ? `<div class="presentation-penalty-numbers">${penaltyHome} - ${penaltyAway}</div><div class="presentation-penalty-label">PENALES</div>` : "";
-    presentationPenaltyScore.style.display = hasPenaltyResult ? "block" : "none";
+    presentationPenaltyScore.style.display = "block";
     presentationFirstLeg.textContent = data.showFirstLeg ? "IDA: " + (data.firstLegHomeScore ?? 0) + " - " + (data.firstLegAwayScore ?? 0) : "";
     presentationFirstLeg.style.display = data.showFirstLeg ? "block" : "none";
     presentationPhase.textContent = nextMatchLabel ? "A CONTINUACIÓN" : (currentPeriod === "ENTRETIEMPO" ? "ENTRETIEMPO" : currentPeriod === "FINAL" ? "FINAL" : currentPeriod);
