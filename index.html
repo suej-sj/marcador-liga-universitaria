@@ -1047,16 +1047,7 @@ function getCurrentSeconds() {
     );
 
 
-  if (gameMode === "futsal") {
-
-    return Math.max(
-      0,
-      seconds - Math.max(0, elapsed)
-    );
-
-  }
-
-
+  // En ambas modalidades el reloj avanza desde el tiempo acumulado.
   return seconds + Math.max(0, elapsed);
 }
 
@@ -1065,23 +1056,6 @@ function updateClock() {
 
   const currentSeconds =
     getCurrentSeconds();
-
-
-  if (
-    gameMode === "futsal" &&
-    running &&
-    currentSeconds <= 0
-  ) {
-
-    seconds = 0;
-
-    running = false;
-
-    clockStartedAt = null;
-
-    stopLocalTimer();
-
-  }
 
 
   const displaySeconds =
