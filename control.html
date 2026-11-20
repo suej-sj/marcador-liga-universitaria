@@ -145,6 +145,9 @@ button:active {
   margin-bottom: 8px;
 }
 
+#futsalTimeSettings input:disabled { opacity: .55; }
+#futsalTimeSettings button:disabled { opacity: .4; cursor: not-allowed; }
+
 </style>
 </head>
 
@@ -208,13 +211,40 @@ button:active {
     <div class="fila">
 
       <button onclick="startClock()">
-        ▶ Iniciar
+        ▶ Iniciar / Continuar
       </button>
 
       <button onclick="pauseClock()">
         ⏸ Pausar
       </button>
 
+    </div>
+
+    <div id="futsalTimeSettings" style="display:none; margin-top:14px; padding-top:12px; border-top:1px solid #333;">
+      <div class="subtitulo-control">CONFIGURAR DURACIÓN DEL PERÍODO (FUTSAL)</div>
+      <div class="fila" style="grid-template-columns:1fr 1fr; gap:8px;">
+        <label style="text-align:center; color:#aaa; font-size:12px;">Minutos
+          <input id="futsalMinutes" type="number" min="0" max="99" step="1" value="20" style="width:100%; margin-top:5px; padding:11px; border-radius:8px; border:1px solid #444; background:#111; color:#fff; font-size:18px; text-align:center;">
+        </label>
+        <label style="text-align:center; color:#aaa; font-size:12px;">Segundos
+          <input id="futsalSeconds" type="number" min="0" max="59" step="1" value="0" style="width:100%; margin-top:5px; padding:11px; border-radius:8px; border:1px solid #444; background:#111; color:#fff; font-size:18px; text-align:center;">
+        </label>
+      </div>
+      <button onclick="applyFutsalTime()" style="background:#24452f; margin-top:8px;">Aplicar duración y cargar el reloj</button>
+      <div class="subtitulo-control" style="margin-top:12px;">AJUSTAR EL TIEMPO RESTANTE (CON EL RELOJ PAUSADO)</div>
+      <div class="fila">
+        <button onclick="adjustFutsalTime(60)">+1 min</button>
+        <button onclick="adjustFutsalTime(-60)">−1 min</button>
+      </div>
+      <div class="fila">
+        <button onclick="adjustFutsalTime(10)">+10 seg</button>
+        <button onclick="adjustFutsalTime(-10)">−10 seg</button>
+      </div>
+      <div class="fila">
+        <button onclick="adjustFutsalTime(1)">+1 seg</button>
+        <button onclick="adjustFutsalTime(-1)">−1 seg</button>
+      </div>
+      <div id="futsalTimeStatus" class="subtitulo-control">La duración configurada se utilizará también al iniciar el segundo tiempo.</div>
     </div>
 
   </div>
@@ -1115,6 +1145,7 @@ let penaltyAwayResults = [];
 let showPenalties = false;
 
 let seconds = 0;
+let futsalDurationSeconds = 20 * 60;
 let gameMode = "futbol";
 
 let running = false;
@@ -1196,11 +1227,10 @@ function setMode(mode) {
   if (
     mode === "futsal" &&
     !running &&
-    currentPeriod === "1T"
+    currentPeriod === "1T" &&
+    seconds <= 0
   ) {
-
-    seconds = 0;
-    clockStartedAt = null;
+    seconds = futsalDurationSeconds;
   }
 
 
@@ -1254,7 +1284,15 @@ function getCurrentSeconds() {
     );
 
 
-  // En ambas modalidades el reloj avanza desde el tiempo acumulado.
+  if (gameMode === "futsal") {
+
+    return Math.max(
+      0,
+      seconds - Math.max(0, elapsed)
+    );
+  }
+
+
   return seconds + Math.max(0, elapsed);
 }
 
@@ -1263,6 +1301,47 @@ function updateClock() {
 
   const currentSeconds =
     getCurrentSeconds();
+
+
+  if (
+    gameMode === "futsal" &&
+    running &&
+    currentSeconds <= 0
+  ) {
+
+    seconds =
+      0;
+
+    running =
+      false;
+
+    clockStartedAt =
+      null;
+
+    stopLocalTimer();
+
+    clockElement.textContent =
+      "00:00";
+
+    estadoElement.textContent =
+      "TIEMPO AGOTADO";
+
+
+    matchRef.update({
+
+      seconds:
+        0,
+
+      running:
+        false,
+
+      clockStartedAt:
+        null
+
+    });
+
+    return;
+  }
 
 
   const minutes =
@@ -1278,6 +1357,64 @@ function updateClock() {
     String(secs).padStart(2, "0");
 }
 
+
+function syncFutsalTimeControls() {
+  const settings = document.getElementById("futsalTimeSettings");
+  const minutesInput = document.getElementById("futsalMinutes");
+  const secondsInput = document.getElementById("futsalSeconds");
+  const status = document.getElementById("futsalTimeStatus");
+  if (!settings || !minutesInput || !secondsInput) return;
+
+  settings.style.display = gameMode === "futsal" ? "block" : "none";
+  const editable = !running && currentPeriod !== "ENTRETIEMPO" && currentPeriod !== "FINAL";
+  minutesInput.disabled = !editable;
+  secondsInput.disabled = !editable;
+  settings.querySelectorAll("button").forEach(function(button) { button.disabled = !editable; });
+
+  if (document.activeElement !== minutesInput) {
+    minutesInput.value = Math.floor(futsalDurationSeconds / 60);
+  }
+  if (document.activeElement !== secondsInput) {
+    secondsInput.value = futsalDurationSeconds % 60;
+  }
+  if (status) {
+    status.textContent = running
+      ? "Pausá el reloj para modificar el tiempo restante o la duración."
+      : "Duración del período: " + String(Math.floor(futsalDurationSeconds / 60)).padStart(2, "0") + ":" + String(futsalDurationSeconds % 60).padStart(2, "0") + ". Se aplica también al segundo tiempo.";
+  }
+}
+
+function saveFutsalClockValues() {
+  return matchRef.update({
+    seconds: seconds,
+    futsalDurationSeconds: futsalDurationSeconds,
+    running: false,
+    clockStartedAt: null
+  });
+}
+
+function applyFutsalTime() {
+  if (loadingFirebase || gameMode !== "futsal" || running || currentPeriod === "ENTRETIEMPO" || currentPeriod === "FINAL") return;
+  const minutes = Number(document.getElementById("futsalMinutes").value);
+  const secs = Number(document.getElementById("futsalSeconds").value);
+  if (!Number.isInteger(minutes) || minutes < 0 || minutes > 99 || !Number.isInteger(secs) || secs < 0 || secs > 59 || (minutes === 0 && secs === 0)) {
+    document.getElementById("futsalTimeStatus").textContent = "Ingresá una duración válida, mayor que 00:00.";
+    return;
+  }
+  futsalDurationSeconds = minutes * 60 + secs;
+  seconds = futsalDurationSeconds;
+  clockStartedAt = null;
+  updateScreen();
+  saveFutsalClockValues();
+}
+
+function adjustFutsalTime(delta) {
+  if (loadingFirebase || gameMode !== "futsal" || running || currentPeriod === "ENTRETIEMPO" || currentPeriod === "FINAL") return;
+  seconds = Math.max(0, seconds + delta);
+  clockStartedAt = null;
+  updateScreen();
+  matchRef.update({ seconds: seconds, running: false, clockStartedAt: null });
+}
 
 function stopLocalTimer() {
 
@@ -1396,6 +1533,7 @@ function updateScreen() {
 
 
   updateClock();
+  syncFutsalTimeControls();
 
   periodElement.textContent =
     currentPeriod;
@@ -1825,6 +1963,12 @@ function startClock() {
   }
 
 
+  if (gameMode === "futsal" && seconds <= 0) {
+    document.getElementById("futsalTimeStatus").textContent = "Configurá una duración o ajustá el reloj antes de iniciar.";
+    return;
+  }
+
+
   running = true;
 
   clockStartedAt =
@@ -1957,7 +2101,7 @@ function startSecondHalf() {
 
   if (gameMode === "futsal") {
 
-    seconds = 0;
+    seconds = futsalDurationSeconds;
 
   } else {
 
@@ -1995,6 +2139,9 @@ function startSecondHalf() {
 
     seconds:
       seconds,
+
+    futsalDurationSeconds:
+      futsalDurationSeconds,
 
     period:
       "2T",
@@ -2140,7 +2287,15 @@ function resetMatch() {
   showPenalties = false;
 
 
-  seconds = 0;
+  if (gameMode === "futsal") {
+
+    seconds = futsalDurationSeconds;
+
+  } else {
+
+    seconds =
+      0;
+  }
 
 
   running = false;
@@ -2192,6 +2347,9 @@ function resetMatch() {
 
     seconds:
       seconds,
+
+    futsalDurationSeconds:
+      futsalDurationSeconds,
 
     running:
       false,
@@ -2320,6 +2478,9 @@ auth.signInAnonymously()
 
         seconds =
           data.seconds ?? 0;
+
+        futsalDurationSeconds =
+          data.futsalDurationSeconds ?? 20 * 60;
 
         running =
           data.running ?? false;
