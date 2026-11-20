@@ -540,14 +540,23 @@ button:active {
 .announcement-crest img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
 .announcement-text { text-align: center; font-size: clamp(24px, 2.2vw, 33px); font-weight: 900; line-height: 1.16; overflow-wrap: anywhere; }
 
-/* Marcador horizontal de penales: debajo del zócalo de anuncios */
+/* El zócalo de anuncios y la tanda comparten exactamente el mismo espacio. */
+.announcement-slot {
+  position: relative;
+  width: 100%;
+  min-height: 185px;
+  flex: 0 0 auto;
+}
 .penalty-broadcast {
   display: none;
+  position: absolute;
+  z-index: 2;
+  inset: 0;
   width: 100%;
-  height: 154px;
-  min-height: 154px;
-  max-height: 154px;
-  flex: 0 0 154px;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  flex: none;
   box-sizing: border-box;
   grid-template-columns: minmax(0,1fr) minmax(170px, .42fr) minmax(0,1fr);
   align-items: stretch;
@@ -585,7 +594,8 @@ button:active {
 .penalty-broadcast-score { font-size: clamp(35px,3.8vw,54px); font-weight:1000; line-height:1; white-space:nowrap; }
 .penalty-broadcast-label { margin-top:8px; font-size:clamp(13px,1.1vw,17px); font-weight:900; letter-spacing:2px; }
 @media (max-width:900px) {
- .penalty-broadcast { height:132px; min-height:132px; max-height:132px; flex-basis:132px; grid-template-columns:minmax(0,1fr) minmax(130px,.38fr) minmax(0,1fr); }
+ .announcement-slot { min-height: 160px; }
+ .penalty-broadcast { grid-template-columns:minmax(0,1fr) minmax(130px,.38fr) minmax(0,1fr); }
  .penalty-broadcast-team { padding:8px 7px; grid-template-rows:27px minmax(0,1fr); }
  .penalty-broadcast-content { gap:5px; }
  .penalty-broadcast-team.home .penalty-broadcast-content { grid-template-columns: clamp(52px,8vw,64px) minmax(0,1fr); }
@@ -789,13 +799,14 @@ button:active {
     <img class="presentation-brand" src="assets/suenos-en-juego.png" alt="Sueños en Juego">
   </section>
 
-  <section id="announcementBar" class="announcement-bar" aria-hidden="true">
-    <div id="announcementCrest" class="announcement-crest"></div>
-    <div id="announcementTextDisplay" class="announcement-text"></div>
-    <img class="announcement-brand" src="assets/logo-suej-circular.png" alt="Sueños en Juego" onerror="this.style.visibility='hidden'">
-  </section>
+  <div class="announcement-slot">
+    <section id="announcementBar" class="announcement-bar" aria-hidden="true">
+      <div id="announcementCrest" class="announcement-crest"></div>
+      <div id="announcementTextDisplay" class="announcement-text"></div>
+      <img class="announcement-brand" src="assets/logo-suej-circular.png" alt="Sueños en Juego" onerror="this.style.visibility='hidden'">
+    </section>
 
-  <section id="penaltyBroadcast" class="penalty-broadcast" aria-hidden="true">
+    <section id="penaltyBroadcast" class="penalty-broadcast" aria-hidden="true">
     <div id="penaltyBroadcastHome" class="penalty-broadcast-team home">
       <div id="penaltyBroadcastHomeName" class="penalty-broadcast-name">LOCAL</div>
       <div class="penalty-broadcast-content">
@@ -814,7 +825,8 @@ button:active {
         <img id="penaltyBroadcastAwayCrest" class="penalty-broadcast-crest" alt="Escudo visitante">
       </div>
     </div>
-  </section>
+    </section>
+  </div>
 </div>
 
 
