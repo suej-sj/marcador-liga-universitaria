@@ -543,13 +543,17 @@ button:active {
 
 /* El zócalo de anuncios y la tanda comparten exactamente el mismo espacio. */
 .announcement-slot {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
+  position: fixed;
+  z-index: 31;
+  top: auto;
+  bottom: 3vh;
+  right: calc(18vw + 32px);
+  left: auto;
+  width: min(82vw, 1160px);
   height: 185px;
   min-height: 185px;
   margin: 0;
+  pointer-events: none;
 }
 .penalty-broadcast {
   display: none;
@@ -598,7 +602,7 @@ button:active {
 .penalty-broadcast-score { font-size: clamp(35px,3.8vw,54px); font-weight:1000; line-height:1; white-space:nowrap; }
 .penalty-broadcast-label { margin-top:8px; font-size:clamp(13px,1.1vw,17px); font-weight:900; letter-spacing:2px; }
 @media (max-width:900px) {
- .announcement-slot { height: 160px; min-height: 160px; }
+ .announcement-slot { width: min(82vw, 1160px); right: calc(18vw + 32px); bottom: 3vh; height: 160px; min-height: 160px; }
  .penalty-broadcast { grid-template-columns:minmax(0,1fr) minmax(130px,.38fr) minmax(0,1fr); }
  .penalty-broadcast-team { padding:8px 7px; grid-template-rows:27px minmax(0,1fr); }
  .penalty-broadcast-content { gap:5px; }
