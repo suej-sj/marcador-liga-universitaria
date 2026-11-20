@@ -490,9 +490,7 @@ button:active {
   top: 36vh;
   right: calc(18vw + 32px);
   width: min(82vw, 1160px);
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+  display: block;
   pointer-events: none;
 }
 .presentation-card, .announcement-bar {
@@ -503,6 +501,9 @@ button:active {
   pointer-events: none;
 }
 .presentation-card {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   padding: 32px 38px 26px;
   border-radius: 18px;
@@ -542,15 +543,18 @@ button:active {
 
 /* El zócalo de anuncios y la tanda comparten exactamente el mismo espacio. */
 .announcement-slot {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 185px;
   min-height: 185px;
-  flex: 0 0 auto;
+  margin: 0;
 }
 .penalty-broadcast {
   display: none;
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   inset: 0;
   width: 100%;
   height: 100%;
@@ -594,7 +598,7 @@ button:active {
 .penalty-broadcast-score { font-size: clamp(35px,3.8vw,54px); font-weight:1000; line-height:1; white-space:nowrap; }
 .penalty-broadcast-label { margin-top:8px; font-size:clamp(13px,1.1vw,17px); font-weight:900; letter-spacing:2px; }
 @media (max-width:900px) {
- .announcement-slot { min-height: 160px; }
+ .announcement-slot { height: 160px; min-height: 160px; }
  .penalty-broadcast { grid-template-columns:minmax(0,1fr) minmax(130px,.38fr) minmax(0,1fr); }
  .penalty-broadcast-team { padding:8px 7px; grid-template-rows:27px minmax(0,1fr); }
  .penalty-broadcast-content { gap:5px; }
