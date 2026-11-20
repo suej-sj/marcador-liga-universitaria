@@ -544,7 +544,11 @@ button:active {
 .penalty-broadcast {
   display: none;
   width: 100%;
+  height: 154px;
   min-height: 154px;
+  max-height: 154px;
+  flex: 0 0 154px;
+  box-sizing: border-box;
   grid-template-columns: minmax(0,1fr) minmax(170px, .42fr) minmax(0,1fr);
   align-items: stretch;
   overflow: hidden;
@@ -556,6 +560,9 @@ button:active {
 .penalty-broadcast.active { display: grid; }
 .penalty-broadcast-team {
   min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
   display: grid;
   grid-template-rows: 32px minmax(0,1fr);
   align-items: center;
@@ -566,11 +573,11 @@ button:active {
 .penalty-broadcast-team.home { border-right: 1px solid rgba(255,255,255,.18); }
 .penalty-broadcast-team.away { border-left: 1px solid rgba(255,255,255,.18); }
 .penalty-broadcast-name { text-align: center; font-size: clamp(15px,1.35vw,21px); font-weight: 900; letter-spacing: .8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.penalty-broadcast-content { display: grid; align-items: center; gap: 12px; min-width: 0; }
+.penalty-broadcast-content { display: grid; align-items: center; gap: 12px; min-width: 0; min-height: 0; overflow: hidden; }
 .penalty-broadcast-team.home .penalty-broadcast-content { grid-template-columns: clamp(76px,7vw,96px) minmax(0,1fr); }
 .penalty-broadcast-team.away .penalty-broadcast-content { grid-template-columns: minmax(0,1fr) clamp(76px,7vw,96px); }
 .penalty-broadcast-crest { width: clamp(72px,6.5vw,90px); height: clamp(72px,6.5vw,90px); justify-self: center; flex: 0 0 auto; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0,0,0,.45)); }
-.penalty-broadcast-results { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); align-items: center; justify-items: center; gap: 2px; min-width: 0; width: 100%; }
+.penalty-broadcast-results { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); align-items: center; justify-items: center; gap: 2px; min-width: 0; min-height: 0; width: 100%; overflow: hidden; }
 .penalty-broadcast-symbol { font-size: clamp(40px,4vw,58px); line-height: 1; font-weight: 1000; text-shadow: 0 2px 5px rgba(0,0,0,.45); }
 .penalty-broadcast-symbol.goal { color: #36e477; }
 .penalty-broadcast-symbol.miss { color: #ff4545; }
@@ -578,7 +585,7 @@ button:active {
 .penalty-broadcast-score { font-size: clamp(35px,3.8vw,54px); font-weight:1000; line-height:1; white-space:nowrap; }
 .penalty-broadcast-label { margin-top:8px; font-size:clamp(13px,1.1vw,17px); font-weight:900; letter-spacing:2px; }
 @media (max-width:900px) {
- .penalty-broadcast { min-height:132px; grid-template-columns:minmax(0,1fr) minmax(130px,.38fr) minmax(0,1fr); }
+ .penalty-broadcast { height:132px; min-height:132px; max-height:132px; flex-basis:132px; grid-template-columns:minmax(0,1fr) minmax(130px,.38fr) minmax(0,1fr); }
  .penalty-broadcast-team { padding:8px 7px; grid-template-rows:27px minmax(0,1fr); }
  .penalty-broadcast-content { gap:5px; }
  .penalty-broadcast-team.home .penalty-broadcast-content { grid-template-columns: clamp(52px,8vw,64px) minmax(0,1fr); }
@@ -1047,7 +1054,16 @@ function getCurrentSeconds() {
     );
 
 
-  // En ambas modalidades el reloj avanza desde el tiempo acumulado.
+  if (gameMode === "futsal") {
+
+    return Math.max(
+      0,
+      seconds - Math.max(0, elapsed)
+    );
+
+  }
+
+
   return seconds + Math.max(0, elapsed);
 }
 
@@ -1056,6 +1072,23 @@ function updateClock() {
 
   const currentSeconds =
     getCurrentSeconds();
+
+
+  if (
+    gameMode === "futsal" &&
+    running &&
+    currentSeconds <= 0
+  ) {
+
+    seconds = 0;
+
+    running = false;
+
+    clockStartedAt = null;
+
+    stopLocalTimer();
+
+  }
 
 
   const displaySeconds =
@@ -1612,8 +1645,9 @@ function startSecondHalf() {
 
   if (gameMode === "futsal") {
 
-    seconds =
-      20 * 60;
+    seconds = Number.isFinite(Number(futsalDurationSeconds)) && Number(futsalDurationSeconds) > 0
+      ? Number(futsalDurationSeconds)
+      : 20 * 60;
 
   } else {
 
